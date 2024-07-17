@@ -1,16 +1,14 @@
 "use server";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../config";
+import { db } from "../config";
 import { parseStringify } from "../utils";
-import { setDoc, doc, Query, getDoc, DocumentReference, addDoc, collection } from "firebase/firestore";
 
 
 // CREATE APPWRITE USER
 export const createUser = async (user: CreateUserParams) => {
   try {
-    const newuser: DocumentReference = await addDoc(collection(db, "users"), user);
-    console.log("User added with ID: ", newuser.id);
+    const newuser = await db.collection('users').add(user);
+    console.log("Document written with ID: ", newuser.id);
 
     return parseStringify(newuser);
   } catch (error: any) {
@@ -21,11 +19,14 @@ export const createUser = async (user: CreateUserParams) => {
 // GET USER
 export const getUser = async (userId: string) => {
   try {
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    if (userDoc.exists()) {
-      return parseStringify(userDoc.data());
+
+    const userDoc = await db.collection('users').doc(userId).get();
+
+    if (!userDoc.exists) {
+      console.log('No such user!');
+      return null;
     } else {
-      throw new Error('User not found');
+      return parseStringify(userDoc.data());
     }
 
   } catch (error) {
@@ -64,12 +65,24 @@ export const getPatient = async (userId: string) => {
     //   [Query.equal("userId", [userId])]
     // );
 
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    if (userDoc.exists()) {
-      return userDoc.data();
+    // const userDoc = await getDoc(doc(db, 'users', userId));
+    // if (userDoc.exists()) {
+    //   return userDoc.data();
+    // }
+
+    const userDoc = await db.collection('users').doc(userId).get();
+
+    if (!userDoc.exists) {
+      console.log('No such user!');
+      return null;
+    } else {
+      return {
+        id: userDoc.id,
+        ...userDoc.data()
+      };
     }
 
-    return parseStringify(userDoc.data());
+    // return parseStringify(userDoc.data());
   } catch (error) {
     console.error(
       "An error occurred while retrieving the patient details:",

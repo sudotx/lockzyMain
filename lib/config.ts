@@ -1,22 +1,17 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import admin from "firebase-admin";
+
+import serviceAccount from "../creds/door-lock-9d58f-firebase-adminsdk-gx99j-57f78f7c11.json"
 
 export const {
   API_KEY,
   PROJECT_ID,
 } = process.env;
 
-const firebaseConfig = {
-  apiKey: API_KEY,
-  projectId: PROJECT_ID,
-};
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+    databaseURL: `https://${PROJECT_ID}.firebaseio.com`,
+  });
+}
 
-const app = initializeApp(firebaseConfig);
-
-export const auth = getAuth(app)
-export const db = getFirestore(app);
-
-
-
-
+export const db = admin.firestore();
