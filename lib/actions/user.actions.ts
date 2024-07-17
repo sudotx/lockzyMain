@@ -3,27 +3,18 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../config";
 import { parseStringify } from "../utils";
-import { setDoc, doc, Query, getDoc } from "firebase/firestore";
+import { setDoc, doc, Query, getDoc, DocumentReference, addDoc, collection } from "firebase/firestore";
 
 
 // CREATE APPWRITE USER
 export const createUser = async (user: CreateUserParams) => {
   try {
-    const newuser = createUserWithEmailAndPassword(
-      auth,
-      user.email,
-      "password"
-    );
+    const newuser: DocumentReference = await addDoc(collection(db, "users"), user);
+    console.log("User added with ID: ", newuser.id);
 
     return parseStringify(newuser);
   } catch (error: any) {
-    // Check existing user
-    // if (error.code === 'auth/email-already-in-use') {
-    //   // Check existing user
-    //   const existingUser = await getUserByEmail(auth, user.email);
-    //   return existingUser;
-    // }
-    // console.error("An error occurred while creating a new user:", error);
+    console.error("An error occurred while creating a new user:", error);
   }
 };
 
