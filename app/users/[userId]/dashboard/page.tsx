@@ -1,22 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { StatCard } from "@/components/StatCard";
-import { columns } from "@/components/table/columns";
-import { DataTable } from "@/components/table/DataTable";
-import OpenButton from "@/components/openDoorButton";
 import { Button } from "@/components/ui/button";
-// import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
 
 const AdminPage = async () => {
-  // const appointments = await getRecentAppointmentList();
-
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
       <header className="admin-header">
         <Link href="/" className="cursor-pointer"></Link>
 
-        <p className="text-16-semibold">User Dashboard</p>
         <p className="text-16-semibold">Monitoring</p>
       </header>
 
@@ -31,7 +23,7 @@ const AdminPage = async () => {
             type="pending"
             count={1}
             label="Current Door Status"
-            icon={"/assets/icons/pending.svg"}
+            icon={"/assets/icons/arrow.svg"}
           />
           <StatCard
             type="cancelled"
@@ -43,7 +35,7 @@ const AdminPage = async () => {
             type="cancelled"
             count={1}
             label="Last Open Time"
-            icon={"/assets/icons/cancelled.svg"}
+            icon={"/assets/icons/calendar.svg"}
           />
         </section>
 
@@ -52,8 +44,6 @@ const AdminPage = async () => {
             Open Door
           </Button>
         </section>
-
-        {/* <DataTable columns={columns} data={appointments.documents} /> */}
       </main>
     </div>
   );

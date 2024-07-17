@@ -9,8 +9,6 @@
 # testing
 /coverage
 
-/creds
-
 # next.js
 /.next/
 /out/
