@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
 import { PatientFormDefaultValues } from "@/constants";
-import { registerPatient } from "@/lib/actions/patient.actions";
+// import { registerPatient } from "@/lib/actions/user.actions";
 import { PatientFormValidation } from "@/lib/validation";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -40,11 +40,11 @@ const RegisterForm = ({ user }: { user: User }) => {
         privacyConsent: values.privacyConsent,
       };
 
-      const newPatient = await registerPatient(patient);
+      // const newPatient = await registerPatient(patient);
 
-      if (newPatient) {
-        router.push(`/patients/${user.$id}/new-appointment`);
-      }
+      // if (newPatient) {
+      //   router.push(`/patients/${user.$id}/new-appointment`);
+      // }
     } catch (error) {
       console.log(error);
     }
