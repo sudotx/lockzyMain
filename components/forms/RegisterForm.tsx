@@ -15,6 +15,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
+import { registerPatient } from "@/lib/actions/user.actions";
 
 const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
@@ -24,8 +25,8 @@ const RegisterForm = ({ user }: { user: User }) => {
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       ...PatientFormDefaultValues,
-      name: user.name,
-      email: user.email,
+      name: "",
+      email: "",
     },
   });
 
@@ -40,11 +41,11 @@ const RegisterForm = ({ user }: { user: User }) => {
         privacyConsent: values.privacyConsent,
       };
 
-      // const newPatient = await registerPatient(patient);
+      const newPatient = await registerPatient(patient);
 
-      // if (newPatient) {
-      //   router.push(`/patients/${user.$id}/new-appointment`);
-      // }
+      if (newPatient) {
+        router.push(`/users/${user.email}/dashboard`);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -64,9 +65,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         </section>
 
         <section className="space-y-6">
-          <div className="mb-9 space-y-1">
-            <h2 className="sub-header">Personal Information</h2>
-          </div>
+          <div className="mb-9 space-y-1"></div>
 
           {/* NAME */}
 
@@ -89,14 +88,6 @@ const RegisterForm = ({ user }: { user: User }) => {
               placeholder="johndoe@gmail.com"
               iconSrc="/assets/icons/email.svg"
               iconAlt="email"
-            />
-
-            <CustomFormField
-              fieldType={FormFieldType.PHONE_INPUT}
-              control={form.control}
-              name="phone"
-              label="Phone Number"
-              placeholder="+2348123456789"
             />
           </div>
         </section>

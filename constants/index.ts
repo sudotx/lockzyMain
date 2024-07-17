@@ -4,7 +4,6 @@ export const PatientFormDefaultValues = {
   firstName: "",
   lastName: "",
   email: "",
-  phone: "",
   privacyConsent: false,
 };
 
