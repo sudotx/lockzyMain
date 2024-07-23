@@ -84,7 +84,7 @@ const DashboardPage = () => {
                     stats={{
                       current: latestSnapshot.current,
                       voltage: latestSnapshot.voltage,
-                      status: latestSnapshot.status,
+                      status: "open",
                     }}
                   />
                 );

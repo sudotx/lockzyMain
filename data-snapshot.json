@@ -2,37 +2,69 @@
   "doors": {
     "Subdean Office 2": [
       {
-        "timestamp": "2024-07-23T10:00:00Z",
+        "timestamp": "2024-07-23T00:00:00Z",
         "current": 10.5,
         "voltage": 230,
-        "lastAccessed": "2024-07-23T10:00:00Z",
-        "status": "open",
+        "lastAccessed": "2024-07-23T00:00:00Z",
+        "status": "closed",
         "id": "0"
       },
       {
-        "timestamp": "2024-07-23T10:15:00Z",
+        "timestamp": "2024-07-23T00:15:00Z",
         "current": 10.7,
         "voltage": 231,
-        "lastAccessed": "2024-07-23T10:00:00Z",
-        "status": "open",
+        "lastAccessed": "2024-07-23T00:00:00Z",
+        "status": "closed",
+        "id": "0"
+      },
+      {
+        "timestamp": "2024-07-23T00:30:00Z",
+        "current": 11.2,
+        "voltage": 232,
+        "lastAccessed": "2024-07-23T00:00:00Z",
+        "status": "closed",
+        "id": "0"
+      },
+      {
+        "timestamp": "2024-07-23T23:45:00Z",
+        "current": 10.3,
+        "voltage": 229,
+        "lastAccessed": "2024-07-23T22:30:00Z",
+        "status": "closed",
         "id": "0"
       }
     ],
     "Subdean Office": [
       {
-        "timestamp": "2024-07-23T10:00:00Z",
+        "timestamp": "2024-07-23T00:00:00Z",
         "current": 9.8,
         "voltage": 230,
-        "lastAccessed": "2024-07-23T10:00:00Z",
-        "status": "open",
+        "lastAccessed": "2024-07-23T00:00:00Z",
+        "status": "closed",
         "id": "1"
       },
       {
-        "timestamp": "2024-07-23T10:15:00Z",
+        "timestamp": "2024-07-23T00:15:00Z",
         "current": 10.0,
         "voltage": 229,
-        "lastAccessed": "2024-07-23T10:00:00Z",
-        "status": "open",
+        "lastAccessed": "2024-07-23T00:00:00Z",
+        "status": "closed",
+        "id": "1"
+      },
+      {
+        "timestamp": "2024-07-23T00:30:00Z",
+        "current": 10.5,
+        "voltage": 231,
+        "lastAccessed": "2024-07-23T00:00:00Z",
+        "status": "closed",
+        "id": "1"
+      },
+      {
+        "timestamp": "2024-07-23T23:45:00Z",
+        "current": 9.9,
+        "voltage": 230,
+        "lastAccessed": "2024-07-23T22:15:00Z",
+        "status": "closed",
         "id": "1"
       }
     ]
