@@ -3,9 +3,7 @@
     "1": {
       "current": 10.5,
       "id": "Subdean Office 2",
-      "voltage": 230,
-      "lastAccessed": "2024-07-23T10:00:00Z",
-      "status": "open"
+      "voltage": 230
     },
     "2": {
       "current": 9.8,

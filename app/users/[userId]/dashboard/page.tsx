@@ -65,11 +65,13 @@ const AdminPage = async () => {
           >
             Open Door
           </Button>
+        </section>
 
+        <div>
           <div className="text-14-regular mt-20 flex justify-between">
             <p className="text-dark-600 xl:text-left">© 2024 Lockzy</p>
           </div>
-        </section>
+        </div>
       </main>
     </div>
   );

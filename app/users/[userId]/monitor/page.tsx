@@ -1,62 +1,101 @@
 "use client";
 
+import ChartComponent from "@/components/ChartComponent";
 import DoorStatItem from "@/components/DoorStatItem";
-import data from "@/data.json";
+import doorData from "@/data-snapshot.json";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
-interface DoorStat {
-  id: string;
+interface DoorSnapshot {
+  timestamp: string;
   current: number;
   voltage: number;
+  lastAccessed: string;
   status: string;
+  id: string;
+}
+
+interface DoorData {
+  [doorName: string]: DoorSnapshot[];
 }
 
 const DashboardPage = () => {
-  const [firestoreStats, setFirestoreStats] = useState<DoorStat[]>([]);
-  const [realtimeStats, setRealtimeStats] = useState<{
-    [key: string]: DoorStat;
-  }>({});
+  const [doorStats, setDoorStats] = useState<DoorData>({});
+  const [selectedDoor, setSelectedDoor] = useState<string>("");
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const realtimeData = data.doors; // Use static data from the imported JSON
-        setRealtimeStats(realtimeData);
-      } catch (error) {
-        console.error("Error fetching door stats:", error);
-      }
+    setDoorStats(doorData.doors);
+    if (Object.keys(doorData.doors).length > 0) {
+      setSelectedDoor(Object.keys(doorData.doors)[0]);
     }
-
-    fetchData();
   }, []);
+
+  const getChartData = (doorName: string) => {
+    const snapshots = doorStats[doorName] || [];
+    return {
+      labels: snapshots.map((snapshot) =>
+        new Date(snapshot.timestamp).toLocaleString()
+      ),
+      currentData: snapshots.map((snapshot) => snapshot.current),
+      voltageData: snapshots.map((snapshot) => snapshot.voltage),
+    };
+  };
+
+  const chartData = getChartData(selectedDoor);
 
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto p-6">
         <div className="sub-container max-w-[800px] mx-auto">
           <div>
+            <h2 className="text-xl font-medium mb-4">Select Door</h2>
+            <select
+              value={selectedDoor}
+              onChange={(e) => setSelectedDoor(e.target.value)}
+              className="mb-4 p-2 rounded border border-gray-300"
+            >
+              {Object.keys(doorStats).map((doorName) => (
+                <option key={doorName} value={doorName}>
+                  {doorName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <h2 className="text-xl font-small mb-4">
+              Voltage and Current Over Time
+            </h2>
+            <div className="mb-12">
+              <ChartComponent
+                currentData={chartData.currentData}
+                labels={chartData.labels}
+                voltageData={chartData.voltageData}
+              />
+            </div>
+          </div>
+          <div>
             <h2 className="text-xl font-medium mb-4">Realtime Door Stats</h2>
             <ul className="space-y-4">
-              {Object.entries(realtimeStats).map(([doorId, stats]) => (
-                <DoorStatItem key={doorId} doorId={stats.id} stats={stats} />
-              ))}
+              {Object.entries(doorStats).map(([doorName, snapshots]) => {
+                const latestSnapshot = snapshots[snapshots.length - 1];
+                return (
+                  <DoorStatItem
+                    key={doorName}
+                    doorId={latestSnapshot.id}
+                    stats={{
+                      current: latestSnapshot.current,
+                      voltage: latestSnapshot.voltage,
+                      status: latestSnapshot.status,
+                    }}
+                  />
+                );
+              })}
             </ul>
           </div>
-
           <div className="text-14-regular mt-20 flex justify-between">
             <p className="text-dark-600 xl:text-left">© 2024 Lockzy</p>
           </div>
         </div>
       </section>
-
-      <Image
-        src="/assets/images/appointment-img.png"
-        height={1500}
-        width={1500}
-        alt="appointment"
-        className="side-img max-w-[390px] bg-bottom"
-      />
     </div>
   );
 };
