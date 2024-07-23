@@ -60,8 +60,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         className="flex-1 space-y-12"
       >
         <section className="space-y-4">
-          <h1 className="header">Welcome 👋</h1>
-          <p className="text-dark-700">Let us know more about yourself.</p>
+          <p className="sub-header">Let us know more about you.</p>
         </section>
 
         <section className="space-y-6">
@@ -74,6 +73,7 @@ const RegisterForm = ({ user }: { user: User }) => {
             control={form.control}
             name="name"
             placeholder="John Doe"
+            label="Name"
             iconSrc="/assets/icons/user.svg"
             iconAlt="user"
           />
@@ -93,9 +93,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         </section>
 
         <section className="space-y-6">
-          <div className="mb-9 space-y-1">
-            <h2 className="sub-header">Consent and Privacy</h2>
-          </div>
+          <div className="mb-9 space-y-1"></div>
           <CustomFormField
             fieldType={FormFieldType.CHECKBOX}
             control={form.control}

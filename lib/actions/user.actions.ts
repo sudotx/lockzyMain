@@ -1,126 +1,156 @@
 "use server";
 
+import { doc } from "@firebase/firestore";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "firebase/auth";
+import { get, onValue, ref, set, update } from "firebase/database";
+import { getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, databa2e, db, timeStamp } from "../config";
 import { parseStringify } from "../utils";
 
+// Define user parameters type
+type CreateUserParams = {
+  email: string;
+  name: string;
+};
 
-export const createUser = async (user: CreateUserParams) => {
+// Create a new user
+export const createUserProfile = async (user: CreateUserParams) => {
   try {
-    const userRecord = await auth.createUser({
-      email: user.email,
-      displayName: user.name,
-    });
+    const userCredential = await createUserWithEmailAndPassword(auth, user.email, "lockzy1234");
+    const userRecord = userCredential.user;
 
-    const newUserRef = databa2e.ref('users').push();
+    if (!userRecord) throw new Error("User creation failed");
 
-    await newUserRef.set({
-      uid: userRecord.uid,
+    let newUserId = userRecord.uid;
+
+    const newUserRefFirestore = doc(db, "users", newUserId);
+
+    await setDoc(newUserRefFirestore, {
+      uid: newUserId,
       name: user.name,
       email: user.email,
     });
 
     return parseStringify({
-      id: newUserRef.key,
-      uid: userRecord.uid,
+      id: newUserId,
       ...user
     });
+
   } catch (error: any) {
     console.error("An error occurred while creating a new user:", error);
   }
 };
 
+
+// Register a patient (or user) with email
 export const registerPatient = async (user: CreateUserParams) => {
   try {
-    const existingUser = await auth.getUserByEmail(user.email).catch(() => null);
+
+    // Check if email is already registered
+    const signInMethods = await fetchSignInMethodsForEmail(auth, user.email);
+
     let userRecord;
-    if (existingUser) {
-      // throw new Error('User with this email already exists');
-      userRecord = existingUser;
+    if (signInMethods.length > 0) {
+      // User exists, retrieve user record
+      // userRecord = await getUserByEmail(user.email);
+      userRecord = {}
     } else {
-      userRecord = await auth.createUser({
-        email: user.email,
-        displayName: user.name,
-      });
+      // User does not exist, create a new user
+      const userCredential = await createUserWithEmailAndPassword(auth, user.email, "temporary-password");
+      userRecord = userCredential.user;
     }
 
-    // Create user document in Realtime Database
-    const newUserRef = databa2e.ref('users').child(userRecord.uid);
-    await newUserRef.set({
+    if (!userRecord) throw new Error("User registration failed");
+
+    // Save new user in Realtime Database
+    const newUserRef = ref(databa2e, `users/${userRecord.uid}`);
+    await set(newUserRef, {
       name: user.name,
       email: user.email,
-      createdAt: timeStamp,
+      createdAt: timeStamp(),
     });
 
-    // Return the new user data
+    // Return the user data
     return parseStringify({
       id: userRecord.uid,
       name: user.name,
       email: user.email,
     });
+
   } catch (error: any) {
-    console.error("An error occurred while creating a new user:", error);
+    console.error("An error occurred while registering the patient:", error);
   }
 };
 
-
-
+// Get user details from Firestore
 export const getUser = async (userId: string) => {
   try {
+    // Create a reference to the user's document
+    const userDocRef = doc(db, "users", userId);
 
-    const userDoc = await db.collection('users').doc(userId).get();
+    // Retrieve the document
+    const userDocSnap = await getDoc(userDocRef);
 
-    if (!userDoc.exists) {
+    // Check if the document exists
+    if (!userDocSnap.exists()) {
       console.log('No such user!');
       return null;
     } else {
-      return parseStringify(userDoc.data());
+      return parseStringify(userDocSnap.data());
     }
-
   } catch (error) {
-    console.error(
-      "An error occurred while retrieving the user details:",
-      error
-    );
+    console.error("An error occurred while retrieving the user details:", error);
   }
 };
 
+// Get patient details from Firestore
 export const getPatient = async (userId: string) => {
   try {
-    const userDoc = await db.collection('users').doc(userId).get();
+    // Create a reference to the user's document
+    const userDocRef = doc(db, "users", userId);
 
-    if (!userDoc.exists) {
+    // Retrieve the document snapshot
+    const userDocSnap = await getDoc(userDocRef);
+
+    // Check if the document exists
+    if (!userDocSnap.exists()) {
       console.log('No such user!');
       return null;
     } else {
+      // Return the document data with the document ID included
       return {
-        id: userDoc.id,
-        ...userDoc.data()
+        id: userDocSnap.id,
+        ...userDocSnap.data()
       };
     }
-
-    // return parseStringify(userDoc.data());
   } catch (error) {
-    console.error(
-      "An error occurred while retrieving the patient details:",
-      error
-    );
+    console.error("An error occurred while retrieving the patient details:", error);
   }
 };
 
-async function writeUserData(userId: string, name: string, email: string) {
+// Write user data to Realtime Database
+export async function writeLogData(logId: string, name: string, email: string) {
   try {
-    await databa2e.ref('users/' + userId).set({
+    // Create a reference to the user's data path
+    const userRef = ref(databa2e, `logs/${logId}`);
+
+    // Write the user data to Realtime Database
+    await set(userRef, {
       username: name,
       email: email
     });
+
     console.log('Data written successfully');
   } catch (error) {
     console.error('Error writing data:', error);
   }
 }
-async function readUserData(userId: string) {
+
+// Read user data from Realtime Database
+export async function readLogData(logId: string) {
   try {
-    const snapshot = await databa2e.ref('users/' + userId).once('value');
+    const userRef = ref(databa2e, `logs/${logId}`);
+    const snapshot = await get(userRef);
     return snapshot.val();
   } catch (error) {
     console.error('Error reading data:', error);
@@ -128,38 +158,30 @@ async function readUserData(userId: string) {
   }
 }
 
-async function updateUserEmail(userId: string, newEmail: string) {
+// Update user email in Realtime Database
+export async function updateUserEmail(userId: string, newEmail: string) {
   try {
-    await databa2e.ref('users/' + userId).update({
-      email: newEmail
-    });
+    const userRef = ref(databa2e, `users/${userId}`);
+    await update(userRef, { email: newEmail });
     console.log('Data updated successfully');
   } catch (error) {
     console.error('Error updating data:', error);
   }
 }
 
-async function deleteUser(userId: string) {
-  try {
-    await databa2e.ref('users/' + userId).remove();
-    console.log('Data deleted successfully');
-  } catch (error) {
-    console.error('Error deleting data:', error);
-  }
-}
-
+// Register biometric access and update door and user status
 export async function registerBiometricAccess(doorId: string) {
   try {
-    const doorRef = databa2e.ref(`doors/${doorId}`);
-    const snapshot = await doorRef.once('value');
-    const doorData = snapshot.val();
+    const doorRef = ref(databa2e, `doors/${doorId}`);
+    const doorSnapshot = await get(doorRef);
+    const doorData = doorSnapshot.val();
 
     if (doorData) {
       const updates: { [key: string]: any } = {};
-      updates[`doors/${doorId}/lastAccessed`] = timeStamp;
+      updates[`doors/${doorId}/lastAccessed`] = timeStamp();
       updates[`users/${doorData.userId}/doorStatus`] = 'open';
 
-      await databa2e.ref().update(updates);
+      await update(ref(databa2e), updates);
     }
   } catch (error) {
     console.error("Error registering biometric access:", error);
@@ -167,47 +189,70 @@ export async function registerBiometricAccess(doorId: string) {
   }
 }
 
+// Listen to door status changes
 export async function listenToDoorStatus(doorId: string, callback: (status: string) => void) {
-  const doorRef = databa2e.ref(`doors/${doorId}/status`);
-  doorRef.on('value', (snapshot: { val: () => any; }) => {
+  const doorRef = ref(databa2e, `doors/${doorId}/status`);
+  onValue(doorRef, (snapshot) => {
     const status = snapshot.val();
     callback(status);
   });
 }
 
+// Change door status and update last accessed time
 export async function changeDoorStatus(userId: string, doorId: string, status: 'open' | 'closed') {
   try {
     const updates: { [key: string]: any } = {};
     updates[`doors/${doorId}/status`] = status;
-    updates[`doors/${doorId}/lastAccessed`] = timeStamp;
+    updates[`doors/${doorId}/lastAccessed`] = timeStamp();
     updates[`users/${userId}/doorStatus`] = status;
 
-    await databa2e.ref().update(updates);
+    await update(ref(databa2e), updates);
   } catch (error) {
     console.error("Error changing door status:", error);
   }
 }
 
-export async function getUserByEmail(email: string) {
-  try {
-    const userRecord = await auth.getUserByEmail(email);
-    return userRecord;
-  } catch (error) {
-    console.error("Error getting user:", error);
-  }
-}
-
+// Associate a user with a door in Firestore
 export async function associateUserWithDoor(userId: string, doorId: string) {
   try {
-    await db.collection('doors').doc(doorId).update({
-      userId: userId
-    });
-    await db.collection('users').doc(userId).update({
-      [`doors.${doorId}`]: true
-    });
+    const doorRef = doc(db, 'doors', doorId);
+    const userRef = doc(db, 'users', userId);
+
+    // Update door document
+    await updateDoc(doorRef, { userId: userId });
+
+    // Update user document
+    await updateDoc(userRef, { [`doors.${doorId}`]: true });
+
     return { message: 'User associated with door successfully' };
   } catch (error) {
     console.error("Error associating user with door:", error);
   }
 }
+
+import { collection, query, where, getDocs } from "firebase/firestore";
+
+// Get user by email
+export const getUserByEmail = async (email: string) => {
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.log('No user found with this email');
+      return null;
+    }
+
+    // Assuming email is unique, we'll return the first matching document
+    const userDoc = querySnapshot.docs[0];
+    return {
+      id: userDoc.id,
+      ...userDoc.data()
+    };
+  } catch (error) {
+    console.error("An error occurred while retrieving the user by email:", error);
+    return null;
+  }
+};
 

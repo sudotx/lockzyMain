@@ -1,0 +1,18 @@
+{
+  "doors": {
+    "1": {
+      "current": 10.5,
+      "id": "Subdean Office 2",
+      "voltage": 230,
+      "lastAccessed": "2024-07-23T10:00:00Z",
+      "status": "open"
+    },
+    "2": {
+      "current": 9.8,
+      "id": "Subdean Office",
+      "voltage": 230,
+      "lastAccessed": "2024-07-23T10:15:00Z",
+      "status": "open"
+    }
+  }
+}

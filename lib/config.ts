@@ -1,24 +1,30 @@
-import admin from "firebase-admin";
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getFirestore } from "firebase/firestore";
 
-import serviceAccount from "../creds/door-lock-9d58f-firebase-adminsdk-gx99j-57f78f7c11.json"
+// Your web app's Firebase configuration
+// You should replace these with your own Firebase config values
+const firebaseConfig = {
+  apiKey: process.env.API_KEY,
+  authDomain: `${process.env.PROJECT_ID}.firebaseapp.com`,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: `${process.env.PROJECT_ID}.appspot.com`,
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  databaseURL: process.env.DATABASE_URL,
+};
 
-export const {
-  API_KEY,
-  PROJECT_ID,
-  DATABASE_URL
-} = process.env;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-    databaseURL: DATABASE_URL,
-  });
-}
+// Initialize Firestore and Realtime Database
+export const db = getFirestore(app);
+export const databa2e = getDatabase(app);
 
-export const db = admin.firestore();
+// Initialize Auth
+export const auth = getAuth(app);
 
-export const databa2e = admin.database();
-
-export const auth = admin.auth();
-
-export const timeStamp = admin.firestore.FieldValue.serverTimestamp;
+// Get server timestamp (if needed)
+import { serverTimestamp } from "firebase/firestore";
+export const timeStamp = serverTimestamp;

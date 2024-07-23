@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
-import { createUser } from "@/lib/actions/user.actions";
+import { createUserProfile, getUserByEmail } from "@/lib/actions/user.actions";
 import { UserFormValidation } from "@/lib/validation";
 
 import "react-phone-number-input/style.css";
@@ -35,11 +35,18 @@ export const PatientForm = () => {
         email: values.email,
       };
 
-      const newUser = await createUser(user);
+      const existingUser = await getUserByEmail(user.email);
 
-      if (newUser) {
+      if (existingUser) {
+        // Handle the case where the user already exists
+        console.log("User already exists:", existingUser);
+        // You may want to show an error message to the user here
+        router.push(`/users/${existingUser?.id}/dashboard`);
+      } else {
+        // Create a new user if they do not exist
+        const newUser = await createUserProfile(user);
+        router.push(`/users/${newUser?.id}/register`);
         console.log(newUser);
-        router.push(`/users/${user.email}/dashboard`);
       }
     } catch (error) {
       console.log(error);
@@ -53,7 +60,6 @@ export const PatientForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         <section className="mb-12 space-y-4">
           <h1 className="header">Welcome Back 👋</h1>
-          <p className="text-dark-700">lets get you logged in</p>
         </section>
 
         <CustomFormField
