@@ -6,14 +6,16 @@ export const UserFormValidation = z.object({
 });
 
 export const PatientFormValidation = z.object({
-  id: z
-    .number(),
+  // id: z
+  //   .number().min(1, "id cannot be less than 1").max(127, "id cannot be more than 127"),
   privacyConsent: z
     .boolean()
     .default(false)
     .refine((value) => value === true, {
       message: "You must consent to privacy in order to proceed",
     }),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export const CreateAppointmentSchema = z.object({
