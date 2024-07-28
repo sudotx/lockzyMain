@@ -14,8 +14,6 @@ const SignIn = () => {
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">
           <SignInForm />
-
-          <p className="copyright py-12">© 2024 Lockzy</p>
         </div>
       </section>
 
