@@ -18,11 +18,9 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
         className="side-img max-w-[390px]"
       />
 
-      <section className="remove-scrollbar container">
-        <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
+      <section className="remove-scrollbar container my-auto">
+        <div className="sub-container max-w-[496px]">
           <RegisterForm user={user} />
-
-          <p className="copyright py-12">© 2024 Lockzy</p>
         </div>
       </section>
 
