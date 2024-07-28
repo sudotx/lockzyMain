@@ -11,8 +11,9 @@ import "react-phone-number-input/style.css";
 import { z } from "zod";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
+import toast from "react-hot-toast";
 
-export const PatientForm = () => {
+export const SignInForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,12 +36,23 @@ export const PatientForm = () => {
     try {
       const existingUser = await getUserByEmail(user.email);
 
+      // buggy
       if (existingUser) {
-        router.push(`/users/${existingUser.id}/dashboard`);
+        // User already exists, redirect to dashboard
+        router.push(`/users/${existingUser.email}/dashboard`);
       } else {
-        const newUser = await createUserProfile(user);
-        router.push(`/users/${newUser.id}/register`);
-        console.log("new user", newUser);
+        try {
+          const newUser = await createUserProfile(user);
+          router.push(`/users/${newUser.uid}/register`);
+        } catch (error: any) {
+          if (error.code === "auth/email-already-in-use") {
+            // Email is already in use, redirect to dashboard
+            toast(error.code);
+            router.push(`/users/${user.email}/dashboard`);
+          } else {
+            throw error; // Re-throw other errors
+          }
+        }
       }
     } catch (error) {
       console.error("Error during user check/creation:", error);
@@ -53,7 +65,7 @@ export const PatientForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         <section className="mb-12 space-y-4">
-          <h1 className="header">Welcome Back 👋</h1>
+          <h1 className="text-3xl font-bold mb-6">Sign In to Lockzy 👇🏾</h1>
         </section>
 
         <CustomFormField
@@ -76,7 +88,7 @@ export const PatientForm = () => {
           iconAlt="password"
         />
 
-        <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
+        <SubmitButton isLoading={isLoading}>Sign In</SubmitButton>
       </form>
     </Form>
   );

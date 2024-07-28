@@ -1,14 +1,14 @@
 "use client";
 
 import { Form } from "@/components/ui/form";
-import { PatientFormDefaultValues } from "@/constants";
-import { registerUser } from "@/lib/actions/user.actions";
+import { createUserProfile } from "@/lib/actions/user.actions";
 import { PatientFormValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useForm } from "react-hook-form";
+import toast, { Toaster } from "react-hot-toast";
 import "react-phone-number-input/style.css";
 import { z } from "zod";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
@@ -18,38 +18,44 @@ const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
+  const notify = (error: string) => {
+    // toast(error);
+    toast("This email is already registered, try signing in instead");
+  };
+
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
-      id: 0,
       privacyConsent: true,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof PatientFormValidation>) => {
+  const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
 
     try {
-      const patient = {
-        userId: "",
-        id: 1,
+      const user = {
         privacyConsent: values.privacyConsent,
+        email: values.email,
+        password: values.password,
       };
 
-      const newPatient = registerUser(patient);
-
-      console.log(newPatient);
-
-      router.push(`/users/${values.id}/dashboard`);
-      // if (newPatient) {
-      //   router.push(`/users/${user.$id}/dashboard`);
-      // }
+      // on registration, save data to firestore
+      try {
+        const newUser = await createUserProfile(user);
+        console.log(newUser);
+        router.push(`/users/${newUser.uid}/dashboard`);
+      } catch (error: any) {
+        notify(error.message);
+      }
     } catch (error) {
       console.log(error);
     }
 
     setIsLoading(false);
   };
+
+  // the door id will be auto assigned based on availability
 
   return (
     <Form {...form}>
@@ -66,12 +72,30 @@ const RegisterForm = ({ user }: { user: User }) => {
 
           {/* ID */}
 
-          <CustomFormField
+          {/* <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="name"
-            placeholder="User Id"
+            placeholder="User/Door Id"
             label="Id"
+            iconSrc="/assets/icons/user.svg"
+            iconAlt="id"
+          /> */}
+          <CustomFormField
+            fieldType={FormFieldType.INPUT}
+            control={form.control}
+            name="email"
+            placeholder="email@mail.com"
+            label="Email"
+            iconSrc="/assets/icons/user.svg"
+            iconAlt="id"
+          />
+          <CustomFormField
+            fieldType={FormFieldType.INPUT}
+            control={form.control}
+            name="password"
+            placeholder="Password"
+            label="Password"
             iconSrc="/assets/icons/user.svg"
             iconAlt="id"
           />
@@ -83,10 +107,12 @@ const RegisterForm = ({ user }: { user: User }) => {
             fieldType={FormFieldType.CHECKBOX}
             control={form.control}
             name="privacyConsent"
-            label="I acknowledge that I have reviewed and agree to the
-            privacy policy"
+            label="I acknowledge the
+            use of my biometrics"
           />
         </section>
+
+        <Toaster />
 
         <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton>
       </form>
