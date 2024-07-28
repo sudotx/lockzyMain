@@ -67,8 +67,8 @@ const AdminPage = async () => {
           <StatCard
             type="cancelled"
             value={1} // number
-            label="Total Open Events"
-            icon={"/assets/icons/cancelled.svg"}
+            label="Door Id"
+            icon={"/assets/icons/1cancelled.svg"}
           />
           <StatCard
             type="cancelled"
