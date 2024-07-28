@@ -1,9 +1,9 @@
 "use server";
 
 import { doc } from "@firebase/firestore";
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
-import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
-import { collection, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, } from "firebase/auth";
+import { equalTo, get, onValue, orderByChild, ref, serverTimestamp, set, update } from "firebase/database";
+import { addDoc, collection, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { auth, databa2e, db, timeStamp } from "../config";
 import { parseStringify } from "../utils";
 
@@ -22,25 +22,13 @@ type RegisterUserParams = {
 export const createUserProfile = async (user: CreateUserParams) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+    const newUser = userCredential.user;
 
-    const userRecord = userCredential.user;
-
-    if (!userRecord) throw new Error("User creation failed");
-
-    const newUserId = userRecord.uid;
-
-    const userRef = ref(databa2e, `users/${newUserId}`)
-
-    await set(userRef, {
-      uid: newUserId,
+    return {
+      uid: newUser.uid,
       email: user.email,
-    });
-
-
-    return parseStringify({
-      id: newUserId,
-      ...user
-    });
+      createdAt: new Date(),
+    };
 
   } catch (error) {
     console.error("An error occurred while creating a new user:", error);
@@ -228,26 +216,17 @@ export async function associateUserWithDoor(userId: string, doorId: string) {
 // Get user by email
 export const getUserByEmail = async (email: string) => {
   try {
-    const usersRef = collection(db, "users");
-
-    console.log("user ref", usersRef);
-
-    const q = query(usersRef, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      console.log('No user found with this email');
-      return null;
+    const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+    if (signInMethods.length > 0) {
+      // User exists
+      // You can then fetch additional user data from Firestore if needed
+      return { email, exists: true };
+    } else {
+      // User does not exist
+      return { email, exists: false };
     }
-
-    // Assuming email is unique, we'll return the first matching document
-    const userDoc = querySnapshot.docs[0];
-    return {
-      id: userDoc.id,
-      ...userDoc.data()
-    };
   } catch (error) {
-    console.error("An error occurred while retrieving the user by email:", error);
+    console.error("Error retrieving user by email:", error);
     return null;
   }
 };
