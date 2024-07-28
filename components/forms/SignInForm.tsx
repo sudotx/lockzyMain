@@ -1,17 +1,17 @@
 "use client";
 
 import { Form } from "@/components/ui/form";
-import { createUserProfile, getUserByEmail } from "@/lib/actions/user.actions";
+import { signIn } from "@/lib/actions/user.actions";
 import { UserFormValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import "react-phone-number-input/style.css";
 import { z } from "zod";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import toast from "react-hot-toast";
 
 export const SignInForm = () => {
   const router = useRouter();
@@ -34,28 +34,15 @@ export const SignInForm = () => {
     };
 
     try {
-      const existingUser = await getUserByEmail(user.email);
-
-      // buggy
-      if (existingUser) {
-        // User already exists, redirect to dashboard
-        router.push(`/users/${existingUser.email}/dashboard`);
+      const usr = await signIn(user.email, user.password);
+      console.log(usr!);
+      if (usr && "uid" in usr) {
+        router.push(`/users/${usr.uid}/dashboard`);
       } else {
-        try {
-          const newUser = await createUserProfile(user);
-          router.push(`/users/${newUser.uid}/register`);
-        } catch (error: any) {
-          if (error.code === "auth/email-already-in-use") {
-            // Email is already in use, redirect to dashboard
-            toast(error.code);
-            router.push(`/users/${user.email}/dashboard`);
-          } else {
-            throw error; // Re-throw other errors
-          }
-        }
+        toast("User object does not contain uid");
       }
-    } catch (error) {
-      console.error("Error during user check/creation:", error);
+    } catch (error: any) {
+      console.log(error);
     }
 
     setIsLoading(false);
