@@ -76,6 +76,7 @@ export const SignInForm = () => {
         />
 
         <SubmitButton isLoading={isLoading}>Sign In</SubmitButton>
+        <p className="copyright py-12">© 2024 Lockzy</p>
       </form>
     </Form>
   );

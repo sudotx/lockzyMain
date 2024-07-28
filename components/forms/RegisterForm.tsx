@@ -113,8 +113,8 @@ const RegisterForm = ({ user }: { user: User }) => {
         </section>
 
         <Toaster />
-
         <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton>
+        <p className="copyright py-12">© 2024 Lockzy</p>
       </form>
     </Form>
   );
