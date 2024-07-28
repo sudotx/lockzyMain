@@ -73,7 +73,7 @@ const DashboardPage = () => {
             </div>
           </div>
           <div>
-            <h2 className="text-xl font-medium mb-4">Realtime Door Stats</h2>
+            <h2 className="text-xl font-medium mb-4">Realtime Stats</h2>
             <ul className="space-y-4">
               {Object.entries(doorStats).map(([doorName, snapshots]) => {
                 const latestSnapshot = snapshots[snapshots.length - 1];

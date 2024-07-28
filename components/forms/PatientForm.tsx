@@ -1,16 +1,14 @@
 "use client";
 
+import { Form } from "@/components/ui/form";
+import { createUserProfile, getUserByEmail } from "@/lib/actions/user.actions";
+import { UserFormValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { Form } from "@/components/ui/form";
-import { createUserProfile, getUserByEmail } from "@/lib/actions/user.actions";
-import { UserFormValidation } from "@/lib/validation";
-
 import "react-phone-number-input/style.css";
+import { z } from "zod";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 
@@ -21,35 +19,31 @@ export const PatientForm = () => {
   const form = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      name: "",
       email: "",
+      password: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
 
-    try {
-      const user = {
-        name: values.name,
-        email: values.email,
-      };
+    const user = {
+      email: values.email,
+      password: values.password,
+    };
 
+    try {
       const existingUser = await getUserByEmail(user.email);
 
       if (existingUser) {
-        // Handle the case where the user already exists
-        console.log("User already exists:", existingUser);
-        // You may want to show an error message to the user here
-        router.push(`/users/${existingUser?.id}/dashboard`);
+        router.push(`/users/${existingUser.id}/dashboard`);
       } else {
-        // Create a new user if they do not exist
         const newUser = await createUserProfile(user);
-        router.push(`/users/${newUser?.id}/register`);
-        console.log(newUser);
+        router.push(`/users/${newUser.id}/register`);
+        console.log("new user", newUser);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error during user check/creation:", error);
     }
 
     setIsLoading(false);
@@ -65,21 +59,21 @@ export const PatientForm = () => {
         <CustomFormField
           fieldType={FormFieldType.INPUT}
           control={form.control}
-          name="name"
-          label="Name"
-          placeholder="CiromaChukwumaAdekunle"
-          iconSrc="/assets/icons/user.svg"
-          iconAlt="user"
-        />
-
-        <CustomFormField
-          fieldType={FormFieldType.INPUT}
-          control={form.control}
           name="email"
           label="Email"
           placeholder="ccade@gmail.com"
           iconSrc="/assets/icons/email.svg"
           iconAlt="email"
+        />
+
+        <CustomFormField
+          fieldType={FormFieldType.INPUT}
+          control={form.control}
+          name="password"
+          label="Password"
+          placeholder="Enter your password"
+          iconSrc="/assets/icons/user.svg"
+          iconAlt="password"
         />
 
         <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>

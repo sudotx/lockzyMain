@@ -1,81 +1,75 @@
 "use server";
 
 import { doc } from "@firebase/firestore";
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "firebase/auth";
-import { get, onValue, ref, set, update } from "firebase/database";
-import { getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
+import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
+import { collection, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { auth, databa2e, db, timeStamp } from "../config";
 import { parseStringify } from "../utils";
 
 // Define user parameters type
 type CreateUserParams = {
   email: string;
-  name: string;
+  password: string;
+};
+type RegisterUserParams = {
+  id: number;
+  userId: string;
+  privacyConsent: boolean;
 };
 
 // Create a new user
 export const createUserProfile = async (user: CreateUserParams) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, user.email, "lockzy1234");
+    const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+
     const userRecord = userCredential.user;
 
     if (!userRecord) throw new Error("User creation failed");
 
-    let newUserId = userRecord.uid;
+    const newUserId = userRecord.uid;
 
-    const newUserRefFirestore = doc(db, "users", newUserId);
+    const userRef = ref(databa2e, `users/${newUserId}`)
 
-    await setDoc(newUserRefFirestore, {
+    await set(userRef, {
       uid: newUserId,
-      name: user.name,
       email: user.email,
     });
+
 
     return parseStringify({
       id: newUserId,
       ...user
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("An error occurred while creating a new user:", error);
+    throw error;
   }
 };
 
 
 // Register a patient (or user) with email
-export const registerPatient = async (user: CreateUserParams) => {
+export const registerUser = async (user: RegisterUserParams) => {
   try {
 
-    // Check if email is already registered
-    const signInMethods = await fetchSignInMethodsForEmail(auth, user.email);
+    const { id, privacyConsent, userId } = user
 
-    let userRecord;
-    if (signInMethods.length > 0) {
-      // User exists, retrieve user record
-      // userRecord = await getUserByEmail(user.email);
-      userRecord = {}
-    } else {
-      // User does not exist, create a new user
-      const userCredential = await createUserWithEmailAndPassword(auth, user.email, "temporary-password");
-      userRecord = userCredential.user;
-    }
-
-    if (!userRecord) throw new Error("User registration failed");
-
-    // Save new user in Realtime Database
-    const newUserRef = ref(databa2e, `users/${userRecord.uid}`);
-    await set(newUserRef, {
-      name: user.name,
-      email: user.email,
-      createdAt: timeStamp(),
+    // Update the user's data in the Realtime Database
+    const userRef = ref(databa2e, `users/${id}`);
+    await update(userRef, {
+      id,
+      userId,
+      privacyConsent,
+      updatedAt: serverTimestamp()
     });
 
-    // Return the user data
-    return parseStringify({
-      id: userRecord.uid,
-      name: user.name,
-      email: user.email,
-    });
+    // Return the updated user data
+    return {
+      id,
+      idNumber: userId,
+      privacyConsent
+    };
 
   } catch (error: any) {
     console.error("An error occurred while registering the patient:", error);
@@ -230,12 +224,14 @@ export async function associateUserWithDoor(userId: string, doorId: string) {
   }
 }
 
-import { collection, query, where, getDocs } from "firebase/firestore";
 
 // Get user by email
 export const getUserByEmail = async (email: string) => {
   try {
     const usersRef = collection(db, "users");
+
+    console.log("user ref", usersRef);
+
     const q = query(usersRef, where("email", "==", email));
     const querySnapshot = await getDocs(q);
 

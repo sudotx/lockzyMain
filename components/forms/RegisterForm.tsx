@@ -1,21 +1,18 @@
 "use client";
 
+import { Form } from "@/components/ui/form";
+import { PatientFormDefaultValues } from "@/constants";
+import { registerUser } from "@/lib/actions/user.actions";
+import { PatientFormValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { Form } from "@/components/ui/form";
-import { PatientFormDefaultValues } from "@/constants";
-// import { registerPatient } from "@/lib/actions/user.actions";
-import { PatientFormValidation } from "@/lib/validation";
-
 import "react-datepicker/dist/react-datepicker.css";
+import { useForm } from "react-hook-form";
 import "react-phone-number-input/style.css";
+import { z } from "zod";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { registerPatient } from "@/lib/actions/user.actions";
 
 const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
@@ -24,28 +21,29 @@ const RegisterForm = ({ user }: { user: User }) => {
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
-      ...PatientFormDefaultValues,
-      name: "",
-      email: "",
+      id: 0,
+      privacyConsent: true,
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
+  const onSubmit = (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
 
     try {
       const patient = {
-        userId: user.$id,
-        name: values.name,
-        email: values.email,
+        userId: "",
+        id: 1,
         privacyConsent: values.privacyConsent,
       };
 
-      const newPatient = await registerPatient(patient);
+      const newPatient = registerUser(patient);
 
-      if (newPatient) {
-        router.push(`/users/${user.email}/dashboard`);
-      }
+      console.log(newPatient);
+
+      router.push(`/users/${values.id}/dashboard`);
+      // if (newPatient) {
+      //   router.push(`/users/${user.$id}/dashboard`);
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -66,30 +64,17 @@ const RegisterForm = ({ user }: { user: User }) => {
         <section className="space-y-6">
           <div className="mb-9 space-y-1"></div>
 
-          {/* NAME */}
+          {/* ID */}
 
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="name"
-            placeholder="John Doe"
-            label="Name"
+            placeholder="User Id"
+            label="Id"
             iconSrc="/assets/icons/user.svg"
-            iconAlt="user"
+            iconAlt="id"
           />
-
-          {/* EMAIL & PHONE */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="email"
-              label="Email address"
-              placeholder="johndoe@gmail.com"
-              iconSrc="/assets/icons/email.svg"
-              iconAlt="email"
-            />
-          </div>
         </section>
 
         <section className="space-y-6">

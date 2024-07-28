@@ -1,15 +1,19 @@
 "use client";
 
-import Link from "next/link";
-
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const AdminPage = async () => {
   const router = useRouter();
-  const handleNavigation = () => {
-    router.push("monitor");
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    setIsMenuOpen(false);
   };
 
   const handleOpenDoorClick = () => {
@@ -19,39 +23,56 @@ const AdminPage = async () => {
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
-      <header className="admin-header">
+      <header className="admin-header flex justify-between items-center">
         <Link href="/" className="cursor-pointer"></Link>
-
-        <button
-          onClick={handleNavigation}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
-        >
-          Go to Monitoring
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-2xl p-2"
+          >
+            ☰
+          </button>
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+              <button
+                onClick={() => handleNavigation("monitor")}
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+              >
+                Go to Monitoring
+              </button>
+              <button
+                onClick={() => handleNavigation("delete-account")}
+                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+              >
+                Delete Account
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="admin-main">
         <section className="w-full space-y-4">
-          <h1 className="header">Welcome 👋</h1>
-          <p className="text-dark-700">Manage your Door stats</p>
+          <h1 className="header">Your Dashboard</h1>
+          <p className="text-dark-700"></p>
         </section>
 
         <section className="admin-stat">
           <StatCard
             type="pending"
-            count={1}
+            value={true} // boolean
             label="Current Door Status"
             icon={"/assets/icons/arrow.svg"}
           />
           <StatCard
             type="cancelled"
-            count={1}
+            value={1} // number
             label="Total Open Events"
             icon={"/assets/icons/cancelled.svg"}
           />
           <StatCard
             type="cancelled"
-            count={1}
+            value={new Date().toISOString()} // date string
             label="Last Open Time"
             icon={"/assets/icons/calendar.svg"}
           />
