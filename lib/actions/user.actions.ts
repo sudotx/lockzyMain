@@ -1,9 +1,9 @@
 "use server";
 
 import { doc } from "@firebase/firestore";
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, } from "firebase/auth";
-import { equalTo, get, onValue, orderByChild, ref, serverTimestamp, set, update } from "firebase/database";
-import { addDoc, collection, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
+import { getDoc, updateDoc } from "firebase/firestore";
 import { auth, databa2e, db, timeStamp } from "../config";
 import { parseStringify } from "../utils";
 
@@ -12,6 +12,7 @@ type CreateUserParams = {
   email: string;
   password: string;
 };
+
 type RegisterUserParams = {
   id: number;
   userId: string;
@@ -35,7 +36,6 @@ export const createUserProfile = async (user: CreateUserParams) => {
     throw error;
   }
 };
-
 
 // Register a patient (or user) with email
 export const registerUser = async (user: RegisterUserParams) => {
@@ -85,31 +85,6 @@ export const getUser = async (userId: string) => {
   }
 };
 
-// Get patient details from Firestore
-export const getPatient = async (userId: string) => {
-  try {
-    // Create a reference to the user's document
-    const userDocRef = doc(db, "users", userId);
-
-    // Retrieve the document snapshot
-    const userDocSnap = await getDoc(userDocRef);
-
-    // Check if the document exists
-    if (!userDocSnap.exists()) {
-      console.log('No such user!');
-      return null;
-    } else {
-      // Return the document data with the document ID included
-      return {
-        id: userDocSnap.id,
-        ...userDocSnap.data()
-      };
-    }
-  } catch (error) {
-    console.error("An error occurred while retrieving the patient details:", error);
-  }
-};
-
 // Write user data to Realtime Database
 export async function writeLogData(logId: string, name: string, email: string) {
   try {
@@ -128,7 +103,7 @@ export async function writeLogData(logId: string, name: string, email: string) {
   }
 }
 
-// Read user data from Realtime Database
+// Read log data from Realtime Database
 export async function readLogData(logId: string) {
   try {
     const userRef = ref(databa2e, `logs/${logId}`);
@@ -140,28 +115,18 @@ export async function readLogData(logId: string) {
   }
 }
 
-// Update user email in Realtime Database
-export async function updateUserEmail(userId: string, newEmail: string) {
-  try {
-    const userRef = ref(databa2e, `users/${userId}`);
-    await update(userRef, { email: newEmail });
-    console.log('Data updated successfully');
-  } catch (error) {
-    console.error('Error updating data:', error);
-  }
-}
-
-// Register biometric access and update door and user status
 export async function registerBiometricAccess(doorId: string) {
+  const doorRef = ref(databa2e, `doors/${doorId}`);
+
   try {
-    const doorRef = ref(databa2e, `doors/${doorId}`);
     const doorSnapshot = await get(doorRef);
     const doorData = doorSnapshot.val();
 
     if (doorData) {
-      const updates: { [key: string]: any } = {};
-      updates[`doors/${doorId}/lastAccessed`] = timeStamp();
-      updates[`users/${doorData.userId}/doorStatus`] = 'open';
+      const updates = {
+        [`doors/${doorId}/lastAccessed`]: timeStamp(),
+        [`users/${doorData.userId}/doorStatus`]: 'open'
+      };
 
       await update(ref(databa2e), updates);
     }
@@ -171,63 +136,60 @@ export async function registerBiometricAccess(doorId: string) {
   }
 }
 
-// Listen to door status changes
-export async function listenToDoorStatus(doorId: string, callback: (status: string) => void) {
-  const doorRef = ref(databa2e, `doors/${doorId}/status`);
-  onValue(doorRef, (snapshot) => {
-    const status = snapshot.val();
-    callback(status);
+export const getDoorStatus = (doorId: string) => {
+  return new Promise<boolean>((resolve, reject) => {
+    const doorStatusRef = ref(databa2e, `doors/${doorId}/status`);
+    onValue(doorStatusRef, (snapshot) => {
+      const status = snapshot.val();
+      resolve(status === 1);
+    }, (error) => {
+      reject(error);
+    });
   });
-}
+};
 
-// Change door status and update last accessed time
-export async function changeDoorStatus(userId: string, doorId: string, status: 'open' | 'closed') {
+export const changeDoorStatus = async (userId: string, doorId: string, status: 'open' | 'closed') => {
+  const updates = {
+    [`doors/${doorId}/status`]: status,
+    [`doors/${doorId}/lastAccessed`]: timeStamp(),
+    [`users/${userId}/doorStatus`]: status
+  };
+
   try {
-    const updates: { [key: string]: any } = {};
-    updates[`doors/${doorId}/status`] = status;
-    updates[`doors/${doorId}/lastAccessed`] = timeStamp();
-    updates[`users/${userId}/doorStatus`] = status;
-
     await update(ref(databa2e), updates);
   } catch (error) {
     console.error("Error changing door status:", error);
+    throw error;
   }
-}
+};
 
-// Associate a user with a door in Firestore
 export async function associateUserWithDoor(userId: string, doorId: string) {
+  const doorRef = doc(db, 'doors', doorId);
+  const userRef = doc(db, 'users', userId);
+
   try {
-    const doorRef = doc(db, 'doors', doorId);
-    const userRef = doc(db, 'users', userId);
-
-    // Update door document
-    await updateDoc(doorRef, { userId: userId });
-
-    // Update user document
-    await updateDoc(userRef, { [`doors.${doorId}`]: true });
+    await Promise.all([
+      updateDoc(doorRef, { userId }),
+      updateDoc(userRef, { [`doors.${doorId}`]: true })
+    ]);
 
     return { message: 'User associated with door successfully' };
   } catch (error) {
     console.error("Error associating user with door:", error);
+    throw error;
   }
 }
 
-
-// Get user by email
-export const getUserByEmail = async (email: string) => {
+export const signIn = async (email: string, password: string) => {
   try {
-    const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-    if (signInMethods.length > 0) {
-      // User exists
-      // You can then fetch additional user data from Firestore if needed
-      return { email, exists: true };
-    } else {
-      // User does not exist
-      return { email, exists: false };
-    }
-  } catch (error) {
-    console.error("Error retrieving user by email:", error);
-    return null;
-  }
-};
+    const userCred = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
+    return userCred.user.toJSON();
+  } catch (error: any) {
+    console.error("Error signin in", error);
+  }
+}
