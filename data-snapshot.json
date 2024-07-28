@@ -1,6 +1,6 @@
 {
   "doors": {
-    "Subdean Office 2": [
+    "Door #2": [
       {
         "timestamp": "2024-07-23T00:00:00Z",
         "current": 10.5,
@@ -34,7 +34,7 @@
         "id": "0"
       }
     ],
-    "Subdean Office": [
+    "Door #1": [
       {
         "timestamp": "2024-07-23T00:00:00Z",
         "current": 9.8,
