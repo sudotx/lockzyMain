@@ -1,12 +1,10 @@
+import RegisterForm from "@/components/forms/RegisterForm";
+import { getUser } from "@/lib/actions/user.actions";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-import RegisterForm from "@/components/forms/RegisterForm";
-import { getPatient, getUser } from "@/lib/actions/user.actions";
-
 const Register = async ({ params: { userId } }: SearchParamProps) => {
   const user = await getUser(userId);
-  const patient = await getPatient(userId);
 
   if (user) redirect(`/users/${userId}/dashboard`);
 
@@ -19,6 +17,7 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
         alt="patient"
         className="side-img max-w-[390px]"
       />
+
       <section className="remove-scrollbar container">
         <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
           <RegisterForm user={user} />
