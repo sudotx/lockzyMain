@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { ChevronDownIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export const NavigationMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -4,19 +4,8 @@ import { NavigationMenu } from "@/components/NavigationMenu";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 const AdminPage = async () => {
-  const router = useRouter();
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleNavigation = (path: string) => {
-    router.push(path);
-    setIsMenuOpen(false);
-  };
-
   const handleOpenDoorClick = () => {
     alert("Opening Your Door.");
     // send open signal to the database
@@ -26,31 +15,6 @@ const AdminPage = async () => {
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
       <header className="admin-header flex justify-between items-center">
         <Link href="/" className="cursor-pointer"></Link>
-        {/* <div className="relative">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-2xl p-2"
-          >
-            ☰
-          </button>
-          {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-              <button
-                onClick={() => handleNavigation("monitor")}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-              >
-                Go to Monitoring
-              </button>
-              <button
-                onClick={() => handleNavigation("delete-account")}
-                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-              >
-                Delete Account
-              </button>
-            </div>
-          )}
-        </div> */}
-
         <NavigationMenu />
       </header>
 
