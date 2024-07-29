@@ -31,7 +31,7 @@ export default function RootLayout({
         )}
       >
         <ChakraProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark">
+          <ThemeProvider attribute="class" defaultTheme="light">
             {children}
           </ThemeProvider>
         </ChakraProvider>

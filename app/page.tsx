@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 
-const Home = ({ searchParams }: SearchParamProps) => {
+const Home = () => {
   return (
     <div className="flex h-screen max-h-screen">
       <Image
@@ -14,7 +14,6 @@ const Home = ({ searchParams }: SearchParamProps) => {
       />
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">
-          {/* <PatientForm /> */}
           <section className="mb-12 space-y-4">
             <h1 className="header">Welcome To Lockzy 🔓</h1>
           </section>
