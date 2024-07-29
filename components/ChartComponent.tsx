@@ -40,8 +40,17 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
-        <YAxis yAxisId="left" />
-        <YAxis yAxisId="right" orientation="right" />
+        <YAxis
+          yAxisId="left"
+          domain={["dataMin - 1", "dataMax + 1"]}
+          label={{ value: "Voltage", angle: -90, position: "insideLeft" }}
+        />
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          domain={["dataMin - 0.1", "dataMax + 0.1"]}
+          label={{ value: "Current", angle: 90, position: "insideRight" }}
+        />
         <Tooltip />
         <Legend />
         <Line

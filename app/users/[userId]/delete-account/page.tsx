@@ -1,8 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-// import router from "next/navigation";
 import { useRouter } from "next/navigation";
 
 const DeleteAccountComingSoon = () => {
