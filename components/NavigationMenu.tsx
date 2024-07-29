@@ -1,0 +1,39 @@
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { ChevronDownIcon } from "lucide-react";
+
+export const NavigationMenu = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    setIsMenuOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        className="text-2xl p-2"
+      ></button>
+      <Menu>
+        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+          Menu
+        </MenuButton>
+        <MenuList>
+          <MenuItem onClick={() => handleNavigation("monitor")}>
+            Go to Monitoring
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation("delete-account")}>
+            Delete Account
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation("logout")} color="red.500">
+            Logout
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </div>
+  );
+};

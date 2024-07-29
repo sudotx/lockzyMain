@@ -1,5 +1,6 @@
 "use client";
 
+import { NavigationMenu } from "@/components/NavigationMenu";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -25,7 +26,7 @@ const AdminPage = async () => {
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
       <header className="admin-header flex justify-between items-center">
         <Link href="/" className="cursor-pointer"></Link>
-        <div className="relative">
+        {/* <div className="relative">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-2xl p-2"
@@ -48,7 +49,9 @@ const AdminPage = async () => {
               </button>
             </div>
           )}
-        </div>
+        </div> */}
+
+        <NavigationMenu />
       </header>
 
       <main className="admin-main">
