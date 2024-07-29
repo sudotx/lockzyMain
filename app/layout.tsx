@@ -11,7 +11,7 @@ const fontSans = FontSans({
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
 });
-
+// metadata
 export const metadata: Metadata = {
   title: "Lockzy",
   description: "An Automated Door Management System.",
