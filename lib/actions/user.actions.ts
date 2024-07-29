@@ -148,12 +148,21 @@ export const getDoorStatus = (doorId: string) => {
   });
 };
 
-export const changeDoorStatus = async (userId: string, doorId: string, status: 'open' | 'closed') => {
+export const changeDoorStatus = async (status: 0 | 1, mode: 0 | 1) => {
+  // const updates = {
+  //   [`doors/${doorId}/status`]: status,
+  //   [`doors/${doorId}/lastAccessed`]: timeStamp(),
+  //   [`users/${userId}/doorStatus`]: status
+  // };
   const updates = {
-    [`doors/${doorId}/status`]: status,
-    [`doors/${doorId}/lastAccessed`]: timeStamp(),
-    [`users/${userId}/doorStatus`]: status
+    [`Fingerprint/Del`]: status,
+    [`Fingerprint/Mode`]: mode,
+
   };
+
+  // Del:
+  // Id:
+  // Mode:
 
   try {
     await update(ref(databa2e), updates);

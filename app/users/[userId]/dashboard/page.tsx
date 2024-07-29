@@ -3,12 +3,14 @@
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
+import { changeDoorStatus } from "@/lib/actions/user.actions";
 import Link from "next/link";
 
 const AdminPage = async () => {
   const handleOpenDoorClick = () => {
     alert("Opening Your Door.");
     // send open signal to the database
+    changeDoorStatus(1, 1);
   };
 
   return (
