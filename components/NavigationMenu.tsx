@@ -29,9 +29,6 @@ export const NavigationMenu = () => {
           <MenuItem onClick={() => handleNavigation("delete-account")}>
             Delete Account
           </MenuItem>
-          <MenuItem onClick={() => handleNavigation("logout")} color="red.500">
-            Logout
-          </MenuItem>
         </MenuList>
       </Menu>
     </div>

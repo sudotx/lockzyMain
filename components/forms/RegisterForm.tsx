@@ -1,8 +1,12 @@
 "use client";
 
 import { Form } from "@/components/ui/form";
-import { createUserProfile } from "@/lib/actions/user.actions";
+import {
+  changeDoorStatus,
+  createUserProfile,
+} from "@/lib/actions/user.actions";
 import { PatientFormValidation } from "@/lib/validation";
+import { Button } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,11 +16,23 @@ import toast, { Toaster } from "react-hot-toast";
 import "react-phone-number-input/style.css";
 import { z } from "zod";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
-import SubmitButton from "../SubmitButton";
 
-const RegisterForm = ({ user }: { user: User }) => {
+const RegisterForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleOpenDoorClickEnrollMode = async () => {
+    await changeDoorStatus(0, 0); // enroll mode
+    toast("Enrollment mode activated. Register Finger With Device");
+
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        const result = await changeDoorStatus(0, 1); // back to normal mode
+        toast(result.message);
+        resolve(result);
+      }, 30000); // 30 secs in milliseconds
+    });
+  };
 
   const notify = (error: string) => {
     // toast(error);
@@ -70,17 +86,6 @@ const RegisterForm = ({ user }: { user: User }) => {
         <section className="space-y-6">
           <div className="mb-9 space-y-1"></div>
 
-          {/* ID */}
-
-          {/* <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="name"
-            placeholder="User/Door Id"
-            label="Id"
-            iconSrc="/assets/icons/user.svg"
-            iconAlt="id"
-          /> */}
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
@@ -113,7 +118,17 @@ const RegisterForm = ({ user }: { user: User }) => {
         </section>
 
         <Toaster />
-        <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton>
+        {/* <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton> */}
+        <section className="button-section flex space-x-4">
+          <Button
+            type="submit"
+            className="shad-primary-btn w-full"
+            onClick={handleOpenDoorClickEnrollMode}
+          >
+            Open Door
+          </Button>
+          <Toaster />
+        </section>
         <p className="copyright py-12">© 2024 Lockzy</p>
       </form>
     </Form>
