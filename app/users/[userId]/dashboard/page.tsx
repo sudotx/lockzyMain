@@ -32,10 +32,10 @@ const AdminPage = async () => {
       </header>
 
       <main className="admin-main">
-        <section className="w-full space-y-4">
+        {/* <section className="w-full space-y-4">
           <h1 className="header">Your Dashboard</h1>
           <p className="text-dark-700"></p>
-        </section>
+        </section> */}
 
         <section className="admin-stat">
           <StatCard
