@@ -2,13 +2,35 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  useDisclosure,
+} from "@chakra-ui/react";
 
 const DeleteAccountComingSoon = () => {
   const router = useRouter();
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  // const cancelRef = React.useRef();
+
   const handleNavigation = (path: string) => {
     router.push(path);
   };
+  const handleDeleteClick = () => {
+    onOpen();
+  };
+
+  const handleDeleteConfirm = () => {
+    // Implement account deletion logic here
+    onClose();
+    // Redirect or show success message
+  };
+
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">
@@ -26,7 +48,6 @@ const DeleteAccountComingSoon = () => {
           >
             Return to Dashboard
           </Button>
-
           <div className="text-14-regular mt-20">
             <p className="text-dark-600">© 2024 Lockzy</p>
           </div>

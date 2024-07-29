@@ -3,14 +3,25 @@
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
-import { changeDoorStatus } from "@/lib/actions/user.actions";
+import { changeDoorStatus, signOutUser } from "@/lib/actions/user.actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 const AdminPage = async () => {
-  const handleOpenDoorClick = () => {
-    alert("Opening Your Door.");
-    // send open signal to the database
-    changeDoorStatus(1, 1);
+  const router = useRouter();
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+  };
+  const handleOpenDoorClick = async () => {
+    const a = await changeDoorStatus(1, 1); // unlock door
+    toast(a.message);
+  };
+
+  const handleSignOut = async () => {
+    signOutUser();
+    toast("youre signed out");
   };
 
   return (
@@ -37,7 +48,7 @@ const AdminPage = async () => {
             type="cancelled"
             value={1} // number
             label="Door Id"
-            icon={"/assets/icons/1cancelled.svg"}
+            icon={"/assets/icons/cancelled.svg"}
           />
           <StatCard
             type="cancelled"
@@ -55,6 +66,18 @@ const AdminPage = async () => {
           >
             Open Door
           </Button>
+
+          <Button
+            type="submit"
+            className="bg-red-500 hover:bg-red-600 text-white w-full"
+            onClick={() => {
+              handleSignOut();
+              handleNavigation("/");
+            }}
+          >
+            Sign Out
+          </Button>
+          <Toaster />
         </section>
       </main>
     </div>
