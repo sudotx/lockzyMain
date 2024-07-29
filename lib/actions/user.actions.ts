@@ -1,7 +1,7 @@
 "use server";
 
 import { doc } from "@firebase/firestore";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
 import { getDoc, updateDoc } from "firebase/firestore";
 import { auth, databa2e, db, timeStamp } from "../config";
@@ -149,25 +149,18 @@ export const getDoorStatus = (doorId: string) => {
 };
 
 export const changeDoorStatus = async (status: 0 | 1, mode: 0 | 1) => {
-  // const updates = {
-  //   [`doors/${doorId}/status`]: status,
-  //   [`doors/${doorId}/lastAccessed`]: timeStamp(),
-  //   [`users/${userId}/doorStatus`]: status
-  // };
-  const updates = {
-    [`Fingerprint/Del`]: status,
-    [`Fingerprint/Mode`]: mode,
-
-  };
-
-  // Del:
-  // Id:
-  // Mode:
+  const fingerprintRef = ref(databa2e, 'Fingerprint');
 
   try {
-    await update(ref(databa2e), updates);
+    const updates = {
+      Del: status,
+      Mode: mode,
+    };
+
+    await update(fingerprintRef, updates);
+    return { success: true, message: "Door Mode updated successfully" };
   } catch (error) {
-    console.error("Error changing door status:", error);
+    console.error("Error updating fingerprint data:", error);
     throw error;
   }
 };
@@ -202,3 +195,14 @@ export const signIn = async (email: string, password: string) => {
     console.error("Error signin in", error);
   }
 }
+
+export const signOutUser = async () => {
+  try {
+    await signOut(auth);
+    console.log("User signed out successfully");
+    return { success: true, message: "User signed out" };
+  } catch (error) {
+    console.error("Error signing out:", error);
+    throw error;
+  }
+};
