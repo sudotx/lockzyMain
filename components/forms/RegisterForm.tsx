@@ -24,14 +24,6 @@ const RegisterForm = () => {
   const handleOpenDoorClickEnrollMode = async () => {
     await changeDoorStatus(0, 0); // enroll mode
     toast("Enrollment mode activated. Register Finger With Device");
-
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        const result = await changeDoorStatus(0, 1); // back to normal mode
-        toast(result.message);
-        resolve(result);
-      }, 30000); // 30 secs in milliseconds
-    });
   };
 
   const notify = (error: string) => {
@@ -42,7 +34,7 @@ const RegisterForm = () => {
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
-      privacyConsent: true,
+      privacyConsent: false,
     },
   });
 
@@ -112,8 +104,7 @@ const RegisterForm = () => {
             fieldType={FormFieldType.CHECKBOX}
             control={form.control}
             name="privacyConsent"
-            label="I acknowledge the
-            use of my biometrics"
+            label="I confirm I am physically present in front of the device"
           />
         </section>
 

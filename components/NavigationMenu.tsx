@@ -12,7 +12,7 @@ export const NavigationMenu = () => {
   return (
     <div className="flex justify-between items-center w-full">
       <section>
-        <h1 className="header">Your Dashboard</h1>
+        <h1 className="header">🔓</h1>
       </section>
 
       <Menu>
