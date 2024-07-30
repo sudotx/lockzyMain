@@ -3,13 +3,28 @@
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
-import { changeDoorStatus, signOutUser } from "@/lib/actions/user.actions";
+import {
+  changeDoorStatus,
+  getFingerPrintId,
+  signOutUser,
+} from "@/lib/actions/user.actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 const AdminPage = async () => {
   const router = useRouter();
+
+  const [doorId, setDoorId] = useState(null);
+
+  useEffect(() => {
+    const fetchDoorId = async () => {
+      const id = (await getIdFromDb()).id;
+      setDoorId(id);
+    };
+    fetchDoorId();
+  }, []);
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -21,7 +36,13 @@ const AdminPage = async () => {
 
   const handleSignOut = async () => {
     signOutUser();
-    toast("youre signed out");
+    handleNavigation("/");
+  };
+
+  const getIdFromDb = async () => {
+    // get current id value from db
+    const res = await getFingerPrintId();
+    return res;
   };
 
   return (
@@ -32,23 +53,18 @@ const AdminPage = async () => {
       </header>
 
       <main className="admin-main">
-        {/* <section className="w-full space-y-4">
-          <h1 className="header">Your Dashboard</h1>
-          <p className="text-dark-700"></p>
-        </section> */}
-
         <section className="admin-stat">
-          <StatCard
+          {/* <StatCard
             type="pending"
             value={true} // boolean
             label="Current Door Status"
-            icon={"/assets/icons/arrow.svg"}
-          />
+            icon={"/assets/icons/check.svg"}
+          /> */}
           <StatCard
             type="cancelled"
-            value={1} // number
+            value={doorId!} // number
             label="Door Id"
-            icon={"/assets/icons/cancelled.svg"}
+            icon={"/assets/icons/user.svg"}
           />
           <StatCard
             type="cancelled"
@@ -72,7 +88,6 @@ const AdminPage = async () => {
             className="bg-red-500 hover:bg-red-600 text-white w-full"
             onClick={() => {
               handleSignOut();
-              handleNavigation("/");
             }}
           >
             Sign Out
