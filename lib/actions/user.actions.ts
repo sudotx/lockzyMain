@@ -165,6 +165,24 @@ export const changeDoorStatus = async (status: 0 | 1, mode: 0 | 1) => {
   }
 };
 
+export const getFingerPrintId = async () => {
+  const fingerprintRef = ref(databa2e, 'Fingerprint');
+
+  try {
+    const snapshot = await get(fingerprintRef);
+    const fingerprintData = snapshot.val();
+
+    if (fingerprintData && fingerprintData.Id) {
+      return { success: true, id: fingerprintData.Id };
+    } else {
+      return { success: false, message: "Fingerprint ID not found" };
+    }
+  } catch (error) {
+    console.error("Error retrieving fingerprint ID:", error);
+    throw error;
+  }
+};
+
 export async function associateUserWithDoor(userId: string, doorId: string) {
   const doorRef = doc(db, 'doors', doorId);
   const userRef = doc(db, 'users', userId);
