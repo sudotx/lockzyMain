@@ -1,13 +1,7 @@
 import RegisterForm from "@/components/forms/RegisterForm";
-import { getUser } from "@/lib/actions/user.actions";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 
 const Register = async ({ params: { userId } }: SearchParamProps) => {
-  const user = await getUser(userId);
-
-  if (user) redirect(`/users/${userId}/dashboard`);
-
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">
