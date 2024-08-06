@@ -1,10 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
+  Box,
+  Button,
   Input,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -16,14 +18,15 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const DeleteAccountComingSoon = () => {
+const DeleteAccountPage = () => {
   const [userId, setUserId] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const toast = useToast();
 
   const handleDelete = () => {
-    // Replace this with your delete logic
+    // Add your delete logic here
+    console.log("Deleting user with ID:", userId);
     toast({
       title: "Account Deleted.",
       description: `User account with ID ${userId} has been deleted.`,
@@ -31,7 +34,7 @@ const DeleteAccountComingSoon = () => {
       duration: 5000,
       isClosable: true,
     });
-    onClose(); // Close the modal after deletion
+    onClose();
   };
 
   const handleNavigation = (path: string) => {
@@ -39,47 +42,58 @@ const DeleteAccountComingSoon = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "20px",
-      }}
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      height="100vh"
+      p={4}
     >
-      <Input
-        placeholder="Enter User ID to delete"
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        mb={4}
-      />
-      <Button onClick={onOpen}>Delete Account</Button>
+      <Box
+        width="full"
+        maxWidth="md"
+        p={6}
+        borderWidth={1}
+        borderRadius="md"
+        boxShadow="md"
+        bg="white"
+      >
+        <Text fontSize="lg" mb={4}>
+          Delete Account
+        </Text>
+        <Input
+          placeholder="Enter user ID"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          mb={4}
+        />
+        <Button colorScheme="red" width="full" onClick={onOpen}>
+          Delete Account
+        </Button>
+      </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm Account Deletion</ModalHeader>
+          <ModalCloseButton />
           <ModalBody>
             <Text>
-              Are you sure you want to delete the account with ID {userId}?
+              Are you sure you want to delete the account with ID: {userId}?
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button
-              type="submit"
-              className="bg-red-500 hover:bg-red-600 text-white w-full"
-              onClick={() => {
-                handleDelete();
-              }}
-            >
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="red" onClick={handleDelete}>
               Delete
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+    </Box>
   );
 };
 
-export default DeleteAccountComingSoon;
+export default DeleteAccountPage;

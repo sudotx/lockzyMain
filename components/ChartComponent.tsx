@@ -1,68 +1,50 @@
 import React from "react";
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
-interface ChartComponentProps {
-  labels: string[];
+interface GaugeChartComponentProps {
   voltageData: number[];
 }
 
-const ChartComponent: React.FC<ChartComponentProps> = ({
-  labels,
+const GaugeChartComponent: React.FC<GaugeChartComponentProps> = ({
   voltageData,
 }) => {
-  const minVoltage = 220; // Replace with actual minimum voltage
-  const maxVoltage = 240; // Replace with actual maximum voltage
+  const minVoltage = 220;
+  const maxVoltage = 240;
 
   const calculateBatteryPercentage = (voltage: number): number => {
     return ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100;
   };
 
-  const data = labels.map((label, index) => ({
-    name: label,
-    batteryPercentage: calculateBatteryPercentage(voltageData[index]),
-  }));
+  const latestBatteryPercentage =
+    voltageData.length > 0
+      ? calculateBatteryPercentage(voltageData[voltageData.length - 1])
+      : 0;
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart
-        data={data}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis
-          domain={[0, 100]}
-          label={{
-            value: "Battery Percentage",
-            angle: -90,
-            position: "insideLeft",
-          }}
-        />
-        <Tooltip />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="batteryPercentage"
-          stroke="#8884d8"
-          activeDot={{ r: 8 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="flex flex-col items-center justify-center h-full p-6">
+      <div className="w-full max-w-[400px]">
+        <div className="relative pt-1">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold inline-block py-1 px-2 rounded-full text-teal-600 bg-teal-200">
+              Battery Percentage
+            </span>
+          </div>
+          <div className="relative flex mb-2 items-center">
+            <div className="flex-1">
+              <div className="relative flex py-1 px-4 border-2 border-teal-200 rounded-full">
+                <div
+                  className="absolute top-0 left-0 h-full bg-teal-400 rounded-full"
+                  style={{ width: `${latestBatteryPercentage}%` }}
+                ></div>
+              </div>
+            </div>
+            <span className="text-xs font-semibold inline-block py-1 px-2 rounded-full text-teal-600 bg-teal-200">
+              {latestBatteryPercentage.toFixed(2)}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default ChartComponent;
+export default GaugeChartComponent;

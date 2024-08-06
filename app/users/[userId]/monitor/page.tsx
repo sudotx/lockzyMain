@@ -1,5 +1,6 @@
 "use client";
 
+import GaugeChartComponent from "@/components/ChartComponent";
 import ChartComponent from "@/components/ChartComponent";
 import DoorStatItem from "@/components/DoorStatItem";
 import doorData from "@/data-snapshot.json";
@@ -61,13 +62,9 @@ const DashboardPage = () => {
             </select>
           </div>
           <div className="mb-12">
-            <ChartComponent
-              // currentData={chartData.currentData}
-              labels={chartData.labels}
-              voltageData={chartData.voltageData}
-            />
+            <GaugeChartComponent voltageData={chartData.voltageData} />
           </div>
-          {/* <div>
+          <div>
             <h2 className="text-xl font-medium mb-4">Realtime Stats</h2>
             <ul className="space-y-4">
               {Object.entries(doorStats).map(([doorName, snapshots]) => {
@@ -85,7 +82,7 @@ const DashboardPage = () => {
                 );
               })}
             </ul>
-          </div> */}
+          </div>
         </div>
       </section>
     </div>
