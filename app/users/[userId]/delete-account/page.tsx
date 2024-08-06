@@ -1,5 +1,6 @@
 "use client";
 
+import { changeDoorStatus } from "@/lib/actions/user.actions";
 import {
   Box,
   Button,
@@ -27,6 +28,7 @@ const DeleteAccountPage = () => {
   const handleDelete = () => {
     // Add your delete logic here
     console.log("Deleting user with ID:", userId);
+    changeDoorStatus(0, 1); // delete mode
     toast({
       title: "Account Deleted.",
       description: `User account with ID ${userId} has been deleted.`,

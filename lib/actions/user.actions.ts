@@ -7,7 +7,6 @@ import { getDoc, updateDoc } from "firebase/firestore";
 import { auth, databa2e, db, timeStamp } from "../config";
 import { parseStringify } from "../utils";
 
-// Define user parameters type
 type CreateUserParams = {
   email: string;
   password: string;
@@ -19,11 +18,32 @@ type RegisterUserParams = {
   privacyConsent: boolean;
 };
 
-// Create a new user
+type UserDetails = {
+  id: string;
+  email: string;
+  doorId?: string;
+  lastUpdated?: string;
+};
+
 export const createUserProfile = async (user: CreateUserParams) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+    const fingerPrintId = await getFingerPrintId();
+
     const newUser = userCredential.user;
+    const doorId = fingerPrintId.id;
+
+    const userDocRef = doc(db, "users", doorId);
+
+    const userDetails: UserDetails = {
+      id: newUser.uid,
+      email: user.email,
+      doorId: doorId || null,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    // Update Firestore with user details
+    await updateDoc(userDocRef, userDetails);
 
     return {
       uid: newUser.uid,
@@ -37,34 +57,6 @@ export const createUserProfile = async (user: CreateUserParams) => {
   }
 };
 
-// Register a patient (or user) with email
-export const registerUser = async (user: RegisterUserParams) => {
-  try {
-
-    const { id, privacyConsent, userId } = user
-
-    // Update the user's data in the Realtime Database
-    const userRef = ref(databa2e, `users/${id}`);
-    await update(userRef, {
-      id,
-      userId,
-      privacyConsent,
-      updatedAt: serverTimestamp()
-    });
-
-    // Return the updated user data
-    return {
-      id,
-      idNumber: userId,
-      privacyConsent
-    };
-
-  } catch (error: any) {
-    console.error("An error occurred while registering the patient:", error);
-  }
-};
-
-// Get user details from Firestore
 export const getUser = async (userId: string) => {
   try {
     // Create a reference to the user's document
@@ -85,25 +77,6 @@ export const getUser = async (userId: string) => {
   }
 };
 
-// Write user data to Realtime Database
-export async function writeLogData(logId: string, name: string, email: string) {
-  try {
-    // Create a reference to the user's data path
-    const userRef = ref(databa2e, `logs/${logId}`);
-
-    // Write the user data to Realtime Database
-    await set(userRef, {
-      username: name,
-      email: email
-    });
-
-    console.log('Data written successfully');
-  } catch (error) {
-    console.error('Error writing data:', error);
-  }
-}
-
-// Read log data from Realtime Database
 export async function readLogData(logId: string) {
   try {
     const userRef = ref(databa2e, `logs/${logId}`);
@@ -112,27 +85,6 @@ export async function readLogData(logId: string) {
   } catch (error) {
     console.error('Error reading data:', error);
     return null;
-  }
-}
-
-export async function registerBiometricAccess(doorId: string) {
-  const doorRef = ref(databa2e, `doors/${doorId}`);
-
-  try {
-    const doorSnapshot = await get(doorRef);
-    const doorData = doorSnapshot.val();
-
-    if (doorData) {
-      const updates = {
-        [`doors/${doorId}/lastAccessed`]: timeStamp(),
-        [`users/${doorData.userId}/doorStatus`]: 'open'
-      };
-
-      await update(ref(databa2e), updates);
-    }
-  } catch (error) {
-    console.error("Error registering biometric access:", error);
-    throw error;
   }
 }
 
