@@ -13,18 +13,22 @@ import {
 interface ChartComponentProps {
   labels: string[];
   voltageData: number[];
-  currentData: number[];
 }
 
 const ChartComponent: React.FC<ChartComponentProps> = ({
   labels,
   voltageData,
-  currentData,
 }) => {
+  const minVoltage = 220; // Replace with actual minimum voltage
+  const maxVoltage = 240; // Replace with actual maximum voltage
+
+  const calculateBatteryPercentage = (voltage: number): number => {
+    return ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100;
+  };
+
   const data = labels.map((label, index) => ({
     name: label,
-    voltage: voltageData[index],
-    current: currentData[index],
+    batteryPercentage: calculateBatteryPercentage(voltageData[index]),
   }));
 
   return (
@@ -41,30 +45,20 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis
-          yAxisId="left"
-          domain={["dataMin - 1", "dataMax + 1"]}
-          label={{ value: "Voltage", angle: -90, position: "insideLeft" }}
-        />
-        <YAxis
-          yAxisId="right"
-          orientation="right"
-          domain={["dataMin - 0.1", "dataMax + 0.1"]}
-          label={{ value: "Current", angle: 90, position: "insideRight" }}
+          domain={[0, 100]}
+          label={{
+            value: "Battery Percentage",
+            angle: -90,
+            position: "insideLeft",
+          }}
         />
         <Tooltip />
         <Legend />
         <Line
-          yAxisId="left"
           type="monotone"
-          dataKey="voltage"
+          dataKey="batteryPercentage"
           stroke="#8884d8"
           activeDot={{ r: 8 }}
-        />
-        <Line
-          yAxisId="right"
-          type="monotone"
-          dataKey="current"
-          stroke="#82ca9d"
         />
       </LineChart>
     </ResponsiveContainer>
