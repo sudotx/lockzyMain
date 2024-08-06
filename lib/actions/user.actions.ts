@@ -2,20 +2,14 @@
 
 import { doc } from "@firebase/firestore";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
+import { get, onValue, ref, update } from "firebase/database";
 import { getDoc, updateDoc } from "firebase/firestore";
-import { auth, databa2e, db, timeStamp } from "../config";
+import { auth, databa2e, db } from "../config";
 import { parseStringify } from "../utils";
 
 type CreateUserParams = {
   email: string;
   password: string;
-};
-
-type RegisterUserParams = {
-  id: number;
-  userId: string;
-  privacyConsent: boolean;
 };
 
 type UserDetails = {
