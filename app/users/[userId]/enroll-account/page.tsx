@@ -2,7 +2,7 @@
 
 import {
   changeDoorStatus,
-  EnrollFingerprintId,
+  enrollFingerprintId,
 } from "@/lib/actions/user.actions";
 import {
   Box,
@@ -25,42 +25,64 @@ import { useState } from "react";
 const EnrollAccountPage = () => {
   const [userId, setUserId] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [confirming, setConfirming] = useState(false); // Track if the user confirmed enrollment
   const router = useRouter();
   const toast = useToast();
 
   const changeMode = async () => {
     try {
+      await changeDoorStatus(0, 0);
       toast({
-        title: "set to enroll mode.",
+        title: "Door set to enroll mode.",
         status: "success",
         duration: 1000,
       });
-      changeDoorStatus(0, 0);
-    } catch (error) {}
+      router.push("dashboard");
+    } catch (error) {
+      console.error("Error changing door mode:", error);
+      toast({
+        title: "Error setting door mode.",
+        description: "There was an issue changing the door mode.",
+        status: "error",
+        duration: 1000,
+      });
+    }
   };
 
-  const handleEnroll = async () => {
+  const handleEnroll = async (val: number) => {
     try {
+      await enrollFingerprintId(val);
       toast({
         title: `ID ${userId} has been enrolled.`,
         status: "success",
         duration: 1000,
       });
-      router.push("dashboard");
 
-      // Close the modal
-      onClose();
-      //   getAndDecrementFingerprintId(userId); // decrement fingerprint ID
-      const iid = parseInt(userId);
-      EnrollFingerprintId(iid);
+      // Call changeMode after enrollment
+      setTimeout(() => {
+        changeMode();
+      }, 1000);
     } catch (error) {
       console.error("An error occurred during the enroll process:", error);
       toast({
-        title: "An error occurred while enrolling the account.",
+        title: "Error enrolling the account.",
+        description: "There was an issue enrolling the account.",
         status: "error",
         duration: 1000,
       });
     }
+  };
+
+  const handleConfirmEnroll = () => {
+    toast({
+      title: "Enrollment process started.",
+      description: "Please wait while we process the enrollment.",
+      status: "info",
+      duration: 1000,
+    });
+    const idx = parseInt(userId);
+    handleEnroll(idx);
+    setConfirming(false);
   };
 
   return (
@@ -93,9 +115,8 @@ const EnrollAccountPage = () => {
           colorScheme="green"
           width="full"
           onClick={() => {
+            setConfirming(true);
             onOpen();
-            changeMode();
-            // handleEnroll();
           }}
         >
           Enroll Account
@@ -116,21 +137,12 @@ const EnrollAccountPage = () => {
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              colorScheme="green"
-              onClick={() => {
-                handleEnroll();
-                // changeMode();
-                onOpen();
-              }}
-            >
+            <Button colorScheme="green" onClick={handleConfirmEnroll}>
               Confirm Enroll
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* <PasskeyModal /> */}
     </Box>
   );
 };

@@ -21,7 +21,6 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PasskeyModal } from "@/components/PasskeyModal";
 
 const DeleteAccountPage = () => {
   const [userId, setUserId] = useState("");
@@ -31,32 +30,40 @@ const DeleteAccountPage = () => {
 
   const changeMode = async () => {
     try {
+      await changeDoorStatus(0, 1);
       toast({
-        title: "set to delete mode.",
+        title: "Door set to delete mode.",
         status: "success",
         duration: 1000,
       });
-      changeDoorStatus(0, 1);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error changing door mode:", error);
+      toast({
+        title: "Error setting door mode.",
+        description: "There was an issue changing the door mode.",
+        status: "error",
+        duration: 1000,
+      });
+    }
   };
 
   const handleDelete = async () => {
     try {
+      await getAndDecrementFingerprintId(); // Decrement fingerprint ID
       toast({
         title: `ID ${userId} has been deleted.`,
         status: "success",
         duration: 1000,
       });
-
       router.push("dashboard");
 
       // Close the modal
       onClose();
-      getAndDecrementFingerprintId(); // decrement fingerprint ID
     } catch (error) {
       console.error("An error occurred during the delete process:", error);
       toast({
         title: "An error occurred while deleting the account.",
+        description: "There was an issue deleting the account.",
         status: "error",
         duration: 1000,
       });
@@ -93,8 +100,8 @@ const DeleteAccountPage = () => {
           colorScheme="red"
           width="full"
           onClick={() => {
-            onOpen();
-            changeMode();
+            changeMode(); // Set door to delete mode
+            onOpen(); // Open the confirmation modal
           }}
         >
           Delete Account
@@ -118,8 +125,7 @@ const DeleteAccountPage = () => {
             <Button
               colorScheme="red"
               onClick={() => {
-                handleDelete();
-                onOpen();
+                handleDelete(); // Handle account deletion
               }}
             >
               Confirm Deletion
@@ -127,8 +133,6 @@ const DeleteAccountPage = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* <PasskeyModal /> */}
     </Box>
   );
 };

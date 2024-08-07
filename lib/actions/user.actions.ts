@@ -163,7 +163,7 @@ export const setFingerprintId = async (id: string) => {
     throw error;
   }
 };
-export const EnrollFingerprintId = async (id: number) => {
+export const enrollFingerprintId = async (id: number) => {
   const fingerprintRef = ref(databa2e, 'Fingerprint');
   try {
     // Retrieve the current fingerprint ID
