@@ -2,9 +2,9 @@
 
 import { doc } from "@firebase/firestore";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { get, onValue, ref, update } from "firebase/database";
+import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
 import { getDoc, updateDoc } from "firebase/firestore";
-import { auth, databa2e, db } from "../config";
+import { auth, databa2e, db, timeStamp } from "../config";
 import { parseStringify } from "../utils";
 
 type CreateUserParams = {
@@ -36,7 +36,8 @@ export const createUserProfile = async (user: CreateUserParams) => {
       lastUpdated: new Date().toISOString(),
     };
 
-    // Update Firestore with user details
+    await associateUserWithDoor(newUser.uid, doorId);
+
     await updateDoc(userDocRef, userDetails);
 
     return {
@@ -71,7 +72,7 @@ export const getUser = async (userId: string) => {
   }
 };
 
-export async function readLogData(logId: string) {
+export const readLogData = async (logId: string) => {
   try {
     const userRef = ref(databa2e, `logs/${logId}`);
     const snapshot = await get(userRef);
@@ -81,18 +82,6 @@ export async function readLogData(logId: string) {
     return null;
   }
 }
-
-export const getDoorStatus = (doorId: string) => {
-  return new Promise<boolean>((resolve, reject) => {
-    const doorStatusRef = ref(databa2e, `doors/${doorId}/status`);
-    onValue(doorStatusRef, (snapshot) => {
-      const status = snapshot.val();
-      resolve(status === 1);
-    }, (error) => {
-      reject(error);
-    });
-  });
-};
 
 export const changeDoorStatus = async (status: 0 | 1, mode: 0 | 1) => {
   const fingerprintRef = ref(databa2e, 'Fingerprint');
@@ -104,7 +93,7 @@ export const changeDoorStatus = async (status: 0 | 1, mode: 0 | 1) => {
     };
 
     await update(fingerprintRef, updates);
-    return { success: true, message: "Door Mode updated successfully" };
+    return { success: true, message: "Mode updated successfully" };
   } catch (error) {
     console.error("Error updating fingerprint data:", error);
     throw error;
@@ -113,7 +102,6 @@ export const changeDoorStatus = async (status: 0 | 1, mode: 0 | 1) => {
 
 export const getFingerPrintId = async () => {
   const fingerprintRef = ref(databa2e, 'Fingerprint');
-
   try {
     const snapshot = await get(fingerprintRef);
     const fingerprintData = snapshot.val();
@@ -129,7 +117,102 @@ export const getFingerPrintId = async () => {
   }
 };
 
-export async function associateUserWithDoor(userId: string, doorId: string) {
+export const getAndDecrementFingerprintId = async () => {
+  const fingerprintRef = ref(databa2e, 'Fingerprint');
+  try {
+    // Retrieve the current fingerprint ID
+    const snapshot = await get(fingerprintRef);
+    const fingerprintData = snapshot.val();
+
+    if (fingerprintData && fingerprintData.Id) {
+      const currentId = fingerprintData.Id;
+      const newId = currentId - 1;
+
+      // Update the database with the decremented ID
+      await update(fingerprintRef, { Id: newId });
+
+      return { success: true, id: newId };
+    } else {
+      return { success: false, message: "Fingerprint ID not found" };
+    }
+  } catch (error) {
+    console.error("Error retrieving and updating fingerprint ID:", error);
+    throw error;
+  }
+};
+
+export const getCurrentPercentage = async () => {
+  const sensorRef = ref(databa2e, 'Solarsensor');
+  try {
+    const snapshot = await get(sensorRef);
+    const sensorData = snapshot.val();
+
+    if (sensorData && sensorData.batPercent) {
+      return { success: true, pct: sensorData.batPercent };
+    } else {
+      return { success: false, pct: "" };
+    }
+  } catch (error) {
+    console.error("Error current percentage:", error);
+    throw error;
+  }
+};
+
+export const getCurrent = async () => {
+  const sensorRef = ref(databa2e, 'Solarsensor');
+
+  try {
+    const snapshot = await get(sensorRef);
+    const sensorData = snapshot.val();
+
+    if (sensorData && sensorData.Current) {
+      return { success: true, curr: sensorData.Current };
+    } else {
+      return { success: false, curr: "" };
+    }
+  } catch (error) {
+    console.error("Error get current:", error);
+    throw error;
+  }
+}
+
+export const getVoltage = async () => {
+  const sensorRef = ref(databa2e, 'Solarsensor');
+
+  try {
+    const snapshot = await get(sensorRef);
+    const sensorData = snapshot.val();
+
+    if (sensorData && sensorData.Voltage) {
+      return { success: true, vlt: sensorData.Voltage };
+    } else {
+      return { success: false, vlt: "" };
+    }
+  } catch (error) {
+    console.error("Error getting voltage", error);
+    throw error;
+  }
+}
+
+export const getPower = async () => {
+  const sensorRef = ref(databa2e, 'Solarsensor');
+
+  try {
+    const snapshot = await get(sensorRef);
+    const sensorData = snapshot.val();
+
+    if (sensorData && sensorData.Power) {
+      return { success: true, pwr: sensorData.Power };
+    } else {
+      return { success: false, pwr: "" };
+    }
+  } catch (error) {
+    console.error("Error getting power:", error);
+    throw error;
+  }
+}
+
+export const associateUserWithDoor = async (userId: string, doorId: string) => {
   const doorRef = doc(db, 'doors', doorId);
   const userRef = doc(db, 'users', userId);
 
