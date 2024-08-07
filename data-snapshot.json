@@ -1,37 +1,41 @@
 {
   "doors": {
-    "Door #1": [
+    "Door 1": [
       {
-        "timestamp": "2024-07-23T00:00:00Z",
-        "current": 9.8,
-        "voltage": 230,
-        "lastAccessed": "2024-07-23T00:00:00Z",
-        "status": "closed",
-        "id": "1"
+        "Current": 1.0136,
+        "Power": 2.16124,
+        "Voltage": 15.16231,
+        "batPercent": 70
       },
       {
-        "timestamp": "2024-07-23T00:15:00Z",
-        "current": 10.0,
-        "voltage": 229,
-        "lastAccessed": "2024-07-23T00:00:00Z",
-        "status": "closed",
-        "id": "1"
+        "Current": 5.0136,
+        "Power": 6.16124,
+        "Voltage": 19.16231,
+        "batPercent": 74
       },
       {
-        "timestamp": "2024-07-23T00:30:00Z",
-        "current": 10.5,
-        "voltage": 231,
-        "lastAccessed": "2024-07-23T00:00:00Z",
-        "status": "closed",
-        "id": "1"
+        "Current": 9.0136,
+        "Power": 10.16124,
+        "Voltage": 23.16231,
+        "batPercent": 78
       },
       {
-        "timestamp": "2024-07-23T23:45:00Z",
-        "current": 9.9,
-        "voltage": 230,
-        "lastAccessed": "2024-07-23T22:15:00Z",
-        "status": "closed",
-        "id": "1"
+        "Current": 13.0136,
+        "Power": 14.16124,
+        "Voltage": 27.16231,
+        "batPercent": 82
+      },
+      {
+        "Current": 17.0136,
+        "Power": 18.16124,
+        "Voltage": 31.16231,
+        "batPercent": 86
+      },
+      {
+        "Current": 21.0136,
+        "Power": 22.16124,
+        "Voltage": 35.16231,
+        "batPercent": 90
       }
     ]
   }
