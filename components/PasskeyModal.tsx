@@ -38,7 +38,7 @@ export const PasskeyModal = () => {
     if (path)
       if (accessKey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY!.toString()) {
         setOpen(false);
-        router.push("/admin");
+        router.push("delete-account");
       } else {
         setOpen(true);
       }
@@ -46,7 +46,7 @@ export const PasskeyModal = () => {
 
   const closeModal = () => {
     setOpen(false);
-    router.push("/");
+    router.push("dashboard");
   };
 
   const validatePasskey = (
@@ -69,7 +69,7 @@ export const PasskeyModal = () => {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent className="shad-alert-dialog">
         <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-start justify-between">
+          <AlertDialogTitle className="flex items-start justify-between text-white">
             Admin Access Verification
             <Image
               src="/assets/icons/close.svg"
@@ -81,7 +81,7 @@ export const PasskeyModal = () => {
             />
           </AlertDialogTitle>
           <AlertDialogDescription>
-            To access the admin page, please enter the passkey.
+            To manage accounts, please enter the admin passkey 123456 .
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div>
@@ -111,7 +111,7 @@ export const PasskeyModal = () => {
             onClick={(e) => validatePasskey(e)}
             className="shad-primary-btn w-full"
           >
-            Enter Admin Passkey
+            Enter
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

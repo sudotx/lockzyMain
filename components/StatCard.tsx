@@ -1,6 +1,6 @@
+import { formatDateTime } from "@/lib/utils";
 import clsx from "clsx";
 import Image from "next/image";
-import { formatDateTime } from "@/lib/utils";
 
 type StatCardProps = {
   type: "appointments" | "pending" | "cancelled";
@@ -39,7 +39,7 @@ export const StatCard = ({ value, label, icon, type }: StatCardProps) => {
         />
         <h2 className="text-32-bold text-white truncate">{renderValue()}</h2>
       </div>
-      <p className="text-14-regular mt-auto">{label}</p>
+      <p className="text-14-regular mt-auto text-white">{label}</p>
     </div>
   );
 };

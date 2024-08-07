@@ -52,7 +52,9 @@ export const SignInForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         <section className="mb-12 space-y-4">
-          <h1 className="text-3xl font-bold mb-6">Sign In to Lockzy 👇🏾</h1>
+          <h1 className="text-3xl font-bold mb-6 text-white">
+            Sign In to Lockzy 👇🏾
+          </h1>
         </section>
 
         <CustomFormField

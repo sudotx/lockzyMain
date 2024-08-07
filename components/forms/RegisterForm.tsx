@@ -72,7 +72,7 @@ const RegisterForm = () => {
         className="flex-1 space-y-12"
       >
         <section className="space-y-4">
-          <p className="sub-header">Let us know more about you.</p>
+          <p className="sub-header text-white">Let us know more about you.</p>
         </section>
 
         <section className="space-y-6">
@@ -109,7 +109,6 @@ const RegisterForm = () => {
         </section>
 
         <Toaster />
-        {/* <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton> */}
         <section className="button-section flex space-x-4">
           <Button
             type="submit"

@@ -21,10 +21,10 @@ export const NavigationMenu = () => {
         </MenuButton>
         <MenuList>
           <MenuItem onClick={() => handleNavigation("monitor")}>
-            Go to Monitoring
+            Monitoring
           </MenuItem>
           <MenuItem onClick={() => handleNavigation("delete-account")}>
-            Delete Account
+            Manage Accounts
           </MenuItem>
         </MenuList>
       </Menu>
