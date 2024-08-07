@@ -1,8 +1,8 @@
+import { ChakraProvider } from "@chakra-ui/react";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Plus_Jakarta_Sans as FontSans } from "next/font/google";
 import "./globals.css";
-import { ChakraProvider } from "@chakra-ui/react";
 
 import { cn } from "@/lib/utils";
 

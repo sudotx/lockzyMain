@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
 const Home = () => {
   return (
@@ -8,7 +8,7 @@ const Home = () => {
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">
           <section className="mb-12 space-y-4">
-            <h1 className="header">Welcome To Lockzy 🔓</h1>
+            <h1 className="header text-white">Welcome To Lockzy 🔓</h1>
           </section>
 
           <div className="space-y-4">
