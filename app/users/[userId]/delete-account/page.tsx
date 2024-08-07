@@ -1,6 +1,9 @@
 "use client";
 
-import { changeDoorStatus } from "@/lib/actions/user.actions";
+import {
+  changeDoorStatus,
+  getAndDecrementFingerprintId,
+} from "@/lib/actions/user.actions";
 import {
   Box,
   Button,
@@ -18,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PasskeyModal } from "@/components/PasskeyModal";
 
 const DeleteAccountPage = () => {
   const [userId, setUserId] = useState("");
@@ -25,22 +29,33 @@ const DeleteAccountPage = () => {
   const router = useRouter();
   const toast = useToast();
 
-  const handleDelete = () => {
-    // Add your delete logic here
-    console.log("Deleting user with ID:", userId);
-    changeDoorStatus(0, 1); // delete mode
-    toast({
-      title: "Account Deleted.",
-      description: `User account with ID ${userId} has been deleted.`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
-    onClose();
-  };
+  const handleDelete = async () => {
+    try {
+      await Promise.all([
+        changeDoorStatus(0, 1), // delete mode
+        getAndDecrementFingerprintId(), // decrement fingerprint ID
+      ]);
 
-  const handleNavigation = (path: string) => {
-    router.push(path);
+      toast({
+        title: "Account Deleted Successfully.",
+        description: `ID ${userId} has been deleted.`,
+        status: "success",
+        duration: 1000,
+      });
+
+      router.push("dashboard");
+
+      // Close the modal
+      onClose();
+    } catch (error) {
+      console.error("An error occurred during the delete process:", error);
+      toast({
+        title: "Error.",
+        description: "An error occurred while deleting the account.",
+        status: "error",
+        duration: 1000,
+      });
+    }
   };
 
   return (
@@ -88,12 +103,20 @@ const DeleteAccountPage = () => {
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme="red" onClick={handleDelete}>
-              Delete
+            <Button
+              colorScheme="red"
+              onClick={() => {
+                handleDelete();
+                onOpen();
+              }}
+            >
+              Confirm Deletion
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* <PasskeyModal /> */}
     </Box>
   );
 };

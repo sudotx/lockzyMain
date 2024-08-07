@@ -1,9 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { changeDoorStatus } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 const LogOutPage = () => {
   const router = useRouter();
@@ -12,10 +10,7 @@ const LogOutPage = () => {
     router.push(path);
   };
 
-  const handleSignOut = async () => {
-    // const a = await changeDoorStatus(0, 1); // enroll mode
-    // toast(a.message);
-  };
+  const handleSignOut = async () => {};
 
   return (
     <div className="flex h-screen max-h-screen">

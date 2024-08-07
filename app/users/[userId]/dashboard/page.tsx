@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@/components/NavBar";
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,11 @@ import {
 } from "@/lib/actions/user.actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 const AdminPage = async () => {
   const router = useRouter();
-
   const [doorId, setDoorId] = useState(null);
 
   useEffect(() => {
@@ -54,12 +54,6 @@ const AdminPage = async () => {
 
       <main className="admin-main">
         <section className="admin-stat">
-          {/* <StatCard
-            type="pending"
-            value={true} // boolean
-            label="Current Door Status"
-            icon={"/assets/icons/check.svg"}
-          /> */}
           <StatCard
             type="cancelled"
             value={doorId!} // number

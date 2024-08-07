@@ -1,18 +1,16 @@
 "use client";
 
 import GaugeChartComponent from "@/components/ChartComponent";
-import ChartComponent from "@/components/ChartComponent";
 import DoorStatItem from "@/components/DoorStatItem";
+import Navbar from "@/components/NavBar";
 import doorData from "@/data-snapshot.json";
 import { useEffect, useState } from "react";
 
 interface DoorSnapshot {
-  timestamp: string;
-  current: number;
-  voltage: number;
-  lastAccessed: string;
-  status: string;
-  id: string;
+  Current: number;
+  Power: number;
+  Voltage: number;
+  batPercent: number;
 }
 
 interface DoorData {
@@ -30,54 +28,26 @@ const DashboardPage = () => {
     }
   }, []);
 
-  const getChartData = (doorName: string) => {
-    const snapshots = doorStats[doorName] || [];
-    return {
-      labels: snapshots.map((snapshot) =>
-        new Date(snapshot.timestamp).toLocaleString()
-      ),
-      currentData: snapshots.map((snapshot) => snapshot.current),
-      voltageData: snapshots.map((snapshot) => snapshot.voltage),
-    };
-  };
-
-  const chartData = getChartData(selectedDoor);
-
   return (
-    <div className="flex h-screen max-h-screen">
+    <div className="flex h-screen max-h-screen flex-col">
       <section className="remove-scrollbar container my-auto p-6">
+        <Navbar />
         <div className="sub-container max-w-[800px] mx-auto">
-          <div>
-            <h2 className="text-xl font-medium mb-4">Select Door</h2>
-            <select
-              value={selectedDoor}
-              onChange={(e) => setSelectedDoor(e.target.value)}
-              className="mb-4 p-2 rounded border border-gray-300"
-            >
-              {Object.keys(doorStats).map((doorName) => (
-                <option key={doorName} value={doorName}>
-                  {doorName}
-                </option>
-              ))}
-            </select>
-          </div>
           <div className="mb-12">
-            <GaugeChartComponent voltageData={chartData.voltageData} />
+            <GaugeChartComponent />
           </div>
           <div>
-            <h2 className="text-xl font-medium mb-4">Realtime Stats</h2>
+            <h2 className="text-xl font-medium mb-3 text-white">
+              Realtime Stats
+            </h2>
+          </div>
+          <div>
             <ul className="space-y-4">
               {Object.entries(doorStats).map(([doorName, snapshots]) => {
-                const latestSnapshot = snapshots[snapshots.length - 1];
                 return (
                   <DoorStatItem
                     key={doorName}
-                    doorId={latestSnapshot.id}
-                    stats={{
-                      current: latestSnapshot.current,
-                      voltage: latestSnapshot.voltage,
-                      status: "open",
-                    }}
+                    doorId={doorName} // Using doorName as ID
                   />
                 );
               })}
