@@ -46,7 +46,6 @@ const EnrollAccountPage = () => {
         status: "success",
         duration: 1000,
       });
-
       router.push("dashboard");
 
       // Close the modal
@@ -95,8 +94,8 @@ const EnrollAccountPage = () => {
           width="full"
           onClick={() => {
             onOpen();
-            // changeMode();
-            handleEnroll();
+            changeMode();
+            // handleEnroll();
           }}
         >
           Enroll Account
@@ -120,8 +119,8 @@ const EnrollAccountPage = () => {
             <Button
               colorScheme="green"
               onClick={() => {
-                // handleEnroll();
-                changeMode();
+                handleEnroll();
+                // changeMode();
                 onOpen();
               }}
             >
