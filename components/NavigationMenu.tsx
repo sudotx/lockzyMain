@@ -24,7 +24,10 @@ export const NavigationMenu = () => {
             Monitoring
           </MenuItem>
           <MenuItem onClick={() => handleNavigation("delete-account")}>
-            Manage Accounts
+            Delete Account
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation("enroll-account")}>
+            Enroll Account
           </MenuItem>
         </MenuList>
       </Menu>

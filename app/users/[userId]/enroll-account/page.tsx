@@ -2,7 +2,7 @@
 
 import {
   changeDoorStatus,
-  getAndDecrementFingerprintId,
+  EnrollFingerprintId,
 } from "@/lib/actions/user.actions";
 import {
   Box,
@@ -21,9 +21,8 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PasskeyModal } from "@/components/PasskeyModal";
 
-const DeleteAccountPage = () => {
+const EnrollAccountPage = () => {
   const [userId, setUserId] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
@@ -32,18 +31,18 @@ const DeleteAccountPage = () => {
   const changeMode = async () => {
     try {
       toast({
-        title: "set to delete mode.",
+        title: "set to enroll mode.",
         status: "success",
         duration: 1000,
       });
-      changeDoorStatus(0, 1);
+      changeDoorStatus(0, 0);
     } catch (error) {}
   };
 
-  const handleDelete = async () => {
+  const handleEnroll = async () => {
     try {
       toast({
-        title: `ID ${userId} has been deleted.`,
+        title: `ID ${userId} has been enrolled.`,
         status: "success",
         duration: 1000,
       });
@@ -52,11 +51,13 @@ const DeleteAccountPage = () => {
 
       // Close the modal
       onClose();
-      getAndDecrementFingerprintId(); // decrement fingerprint ID
+      //   getAndDecrementFingerprintId(userId); // decrement fingerprint ID
+      const iid = parseInt(userId);
+      EnrollFingerprintId(iid);
     } catch (error) {
-      console.error("An error occurred during the delete process:", error);
+      console.error("An error occurred during the enroll process:", error);
       toast({
-        title: "An error occurred while deleting the account.",
+        title: "An error occurred while enrolling the account.",
         status: "error",
         duration: 1000,
       });
@@ -81,34 +82,35 @@ const DeleteAccountPage = () => {
         bg="white"
       >
         <Text fontSize="lg" mb={4}>
-          Delete Account
+          Enroll Account
         </Text>
         <Input
-          placeholder="Enter user ID"
+          placeholder="Enter an ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           mb={4}
         />
         <Button
-          colorScheme="red"
+          colorScheme="green"
           width="full"
           onClick={() => {
             onOpen();
-            changeMode();
+            // changeMode();
+            handleEnroll();
           }}
         >
-          Delete Account
+          Enroll Account
         </Button>
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Confirm Account Deletion</ModalHeader>
+          <ModalHeader>Confirm Account Enroll</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text>
-              Are you sure you want to delete the account with ID: {userId}?
+              Are you sure you want to enroll the account with ID: {userId}?
             </Text>
           </ModalBody>
           <ModalFooter>
@@ -116,13 +118,14 @@ const DeleteAccountPage = () => {
               Cancel
             </Button>
             <Button
-              colorScheme="red"
+              colorScheme="green"
               onClick={() => {
-                handleDelete();
+                // handleEnroll();
+                changeMode();
                 onOpen();
               }}
             >
-              Confirm Deletion
+              Confirm Enroll
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -133,4 +136,4 @@ const DeleteAccountPage = () => {
   );
 };
 
-export default DeleteAccountPage;
+export default EnrollAccountPage;

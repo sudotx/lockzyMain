@@ -140,6 +140,49 @@ export const getAndDecrementFingerprintId = async () => {
     throw error;
   }
 };
+export const setFingerprintId = async (id: string) => {
+  const fingerprintRef = ref(databa2e, 'Fingerprint');
+  try {
+    // Retrieve the current fingerprint ID
+    const snapshot = await get(fingerprintRef);
+    const fingerprintData = snapshot.val();
+
+    if (fingerprintData && fingerprintData.Id) {
+      const currentId = fingerprintData.Id;
+      const newId = currentId - 1;
+
+      // Update the database with the decremented ID
+      await update(fingerprintRef, { Id: newId });
+
+      return { success: true, id: newId };
+    } else {
+      return { success: false, message: "Fingerprint ID not found" };
+    }
+  } catch (error) {
+    console.error("Error retrieving and updating fingerprint ID:", error);
+    throw error;
+  }
+};
+export const EnrollFingerprintId = async (id: number) => {
+  const fingerprintRef = ref(databa2e, 'Fingerprint');
+  try {
+    // Retrieve the current fingerprint ID
+    const snapshot = await get(fingerprintRef);
+    const fingerprintData = snapshot.val();
+
+    if (fingerprintData && fingerprintData.Id) {
+
+      await update(fingerprintRef, { Id: id });
+
+      return { success: true, id: id };
+    } else {
+      return { success: false, message: "Fingerprint ID not found" };
+    }
+  } catch (error) {
+    console.error("Error retrieving and updating fingerprint ID:", error);
+    throw error;
+  }
+};
 
 export const getCurrentPercentage = async () => {
   const sensorRef = ref(databa2e, 'Solarsensor');

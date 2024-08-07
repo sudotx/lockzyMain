@@ -17,11 +17,11 @@ const Home = () => {
                 Sign In
               </Button>
             </Link>
-            <Link href="/register">
+            {/* <Link href="/register">
               <Button className="w-full" variant="outline">
                 Get Started
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </section>
