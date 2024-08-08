@@ -20,7 +20,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const EnrollAccountPage = () => {
   const [userId, setUserId] = useState("");
@@ -37,7 +37,6 @@ const EnrollAccountPage = () => {
         status: "success",
         duration: 1000,
       });
-      router.push("dashboard");
     } catch (error) {
       console.error("Error changing door mode:", error);
       toast({
@@ -52,16 +51,20 @@ const EnrollAccountPage = () => {
   const handleEnroll = async (val: number) => {
     try {
       await enrollFingerprintId(val);
+      let user = {
+        userId: userId,
+        id: val,
+        email: "active",
+        lastUpdated: new Date(),
+      };
       toast({
         title: `ID ${userId} has been enrolled.`,
         status: "success",
         duration: 1000,
       });
 
-      // Call changeMode after enrollment
-      setTimeout(() => {
-        changeMode();
-      }, 1000);
+      // Optionally, redirect or perform additional actions
+      router.push("dashboard");
     } catch (error) {
       console.error("An error occurred during the enroll process:", error);
       toast({
@@ -74,16 +77,18 @@ const EnrollAccountPage = () => {
   };
 
   const handleConfirmEnroll = () => {
-    toast({
-      title: "Enrollment process started.",
-      description: "Please wait while we process the enrollment.",
-      status: "info",
-      duration: 1000,
-    });
-    const idx = parseInt(userId);
-    handleEnroll(idx);
-    setConfirming(false);
+    setConfirming(true);
+    changeMode();
   };
+
+  // Trigger enrollment process after setting the mode
+  useEffect(() => {
+    if (confirming) {
+      const idx = parseInt(userId);
+      handleEnroll(idx);
+      setConfirming(false);
+    }
+  }, [confirming]);
 
   return (
     <Box
@@ -115,7 +120,6 @@ const EnrollAccountPage = () => {
           colorScheme="green"
           width="full"
           onClick={() => {
-            setConfirming(true);
             onOpen();
           }}
         >

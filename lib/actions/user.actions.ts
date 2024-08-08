@@ -2,9 +2,9 @@
 
 import { doc } from "@firebase/firestore";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { get, onValue, ref, serverTimestamp, set, update } from "firebase/database";
-import { getDoc, updateDoc } from "firebase/firestore";
-import { auth, databa2e, db, timeStamp } from "../config";
+import { get, ref, update } from "firebase/database";
+import { deleteDoc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { auth, databa2e, db } from "../config";
 import { parseStringify } from "../utils";
 
 type CreateUserParams = {
@@ -51,6 +51,41 @@ export const createUserProfile = async (user: CreateUserParams) => {
     throw error;
   }
 };
+
+// export const createUserProfile2 = async (user: CreateUserParams) => {
+//   try {
+//     const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+//     const fingerPrintId = await getFingerPrintId();
+
+//     const newUser = userCredential.user;
+//     const doorId = fingerPrintId.id;
+
+//     const userDocRef = doc(db, "users", newUser.uid);
+
+//     const userDetails: UserDetails = {
+//       id: newUser.uid,
+//       email: user.email,
+//       doorId: doorId || null,
+//       lastUpdated: new Date().toISOString(),
+
+//     };
+
+//     await associateUserWithDoor(newUser.uid, doorId);
+
+//     await updateDoc(userDocRef, userDetails);
+
+//     return {
+//       uid: newUser.uid,
+//       email: user.email,
+//       createdAt: new Date(),
+//     };
+
+//   } catch (error) {
+//     console.error("An error occurred while creating a new user:", error);
+//     throw error;
+//   }
+// };
+
 
 export const getUser = async (userId: string) => {
   try {
@@ -293,6 +328,93 @@ export const signOutUser = async () => {
     return { success: true, message: "User signed out" };
   } catch (error) {
     console.error("Error signing out:", error);
+    throw error;
+  }
+};
+
+// Function to save or update user data in Firestore
+export const saveUserToFirestore = async (userDetails: UserDetails) => {
+  try {
+    const userDocRef = doc(db, "users", userDetails.id);
+    await setDoc(userDocRef, userDetails, { merge: true }); // Use merge to update existing fields
+    return { success: true, message: "User data saved successfully" };
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    throw error;
+  }
+};
+
+// Function to get user data by ID from Firestore
+export const getUserFromFirestore = async (userId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      console.log("No such user!");
+      return null;
+    } else {
+      return userDocSnap.data() as UserDetails;
+    }
+  } catch (error) {
+    console.error("Error retrieving user data:", error);
+    throw error;
+  }
+};
+
+// Function to delete a user by ID from Firestore
+export const deleteUserFromFirestore = async (userId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    await deleteDoc(userDocRef);
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting user data:", error);
+    throw error;
+  }
+};
+
+// Example usage within your existing functions
+
+// export const createUserProfile = async (user: CreateUserParams) => {
+//   try {
+//     const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+//     const fingerPrintId = await getFingerPrintId();
+
+//     const newUser = userCredential.user;
+//     const doorId = fingerPrintId.id;
+
+//     const userDetails: UserDetails = {
+//       id: newUser.uid,
+//       email: user.email,
+//       doorId: doorId || null,
+//       lastUpdated: new Date().toISOString(),
+//     };
+
+//     await associateUserWithDoor(newUser.uid, doorId);
+
+//     // Save user details to Firestore
+//     await saveUserToFirestore(userDetails);
+
+//     return {
+//       uid: newUser.uid,
+//       email: user.email,
+//       createdAt: new Date(),
+//     };
+//   } catch (error) {
+//     console.error("An error occurred while creating a new user:", error);
+//     throw error;
+//   }
+// };
+
+// Example of updating user profile information
+export const updateUserProfile = async (userId: string, updates: Partial<UserDetails>) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    await updateDoc(userDocRef, updates);
+    return { success: true, message: "User profile updated successfully" };
+  } catch (error) {
+    console.error("Error updating user profile:", error);
     throw error;
   }
 };

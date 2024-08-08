@@ -11,7 +11,7 @@ const firebaseConfig = {
   projectId: process.env.PROJECT_ID,
   storageBucket: `${process.env.PROJECT_ID}.appspot.com`,
   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  appId: "1",
   databaseURL: process.env.DATABASE_URL,
 };
 
@@ -24,6 +24,8 @@ export const databa2e = getDatabase(app);
 
 // Initialize Auth
 export const auth = getAuth(app);
+
+console.log("app", app.name);
 
 // Get server timestamp (if needed)
 import { serverTimestamp } from "firebase/firestore";
