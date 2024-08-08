@@ -36,6 +36,9 @@ const DeleteAccountPage = () => {
         status: "success",
         duration: 1000,
       });
+      // Close the modal
+      onClose();
+      router.push("dashboard");
     } catch (error) {
       console.error("Error changing door mode:", error);
       toast({
@@ -55,10 +58,6 @@ const DeleteAccountPage = () => {
         status: "success",
         duration: 1000,
       });
-      router.push("dashboard");
-
-      // Close the modal
-      onClose();
     } catch (error) {
       console.error("An error occurred during the delete process:", error);
       toast({
@@ -100,7 +99,7 @@ const DeleteAccountPage = () => {
           colorScheme="red"
           width="full"
           onClick={() => {
-            changeMode(); // Set door to delete mode
+            handleDelete(); // Handle account deletion
             onOpen(); // Open the confirmation modal
           }}
         >
@@ -125,7 +124,8 @@ const DeleteAccountPage = () => {
             <Button
               colorScheme="red"
               onClick={() => {
-                handleDelete(); // Handle account deletion
+                // handleDelete(); // Handle account deletion
+                changeMode(); // Set door to delete mode
               }}
             >
               Confirm Deletion
